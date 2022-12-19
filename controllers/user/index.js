@@ -1,0 +1,10 @@
+module.exports.userController = require('./user.controller');
+module.exports.adminUsersController = require('./adminUsers.controller');
+module.exports.productController = require('./product.controller');
+module.exports.subscriptionController = require('./subscription.controller');
+module.exports.verifiedSellersController = require('./verifiedSellers.controller');
+module.exports.flakersController = require('./flakers.controller');
+module.exports.discountCouponsController = require('./discountCoupons.controller');
+module.exports.bidsController = require('./bids.controller');
+module.exports.transactionController = require('./transaction.controller');
+module.exports.authController = require('./auth.controller');

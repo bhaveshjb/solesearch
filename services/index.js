@@ -1,0 +1,13 @@
+module.exports.userService = require('./user.service');
+module.exports.adminUsersService = require('./adminUsers.service');
+module.exports.productService = require('./product.service');
+module.exports.subscriptionService = require('./subscription.service');
+module.exports.verifiedSellersService = require('./verifiedSellers.service');
+module.exports.flakersService = require('./flakers.service');
+module.exports.discountCouponsService = require('./discountCoupons.service');
+module.exports.bidsService = require('./bids.service');
+module.exports.transactionService = require('./transaction.service');
+module.exports.authService = require('./auth.service');
+module.exports.emailService = require('./email.service');
+module.exports.tokenService = require('./token.service');
+module.exports.passportService = require('./passport.service');

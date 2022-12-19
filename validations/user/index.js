@@ -1,0 +1,10 @@
+module.exports.userValidation = require('./user.validation');
+module.exports.adminUsersValidation = require('./adminUsers.validation');
+module.exports.productValidation = require('./product.validation');
+module.exports.subscriptionValidation = require('./subscription.validation');
+module.exports.verifiedSellersValidation = require('./verifiedSellers.validation');
+module.exports.flakersValidation = require('./flakers.validation');
+module.exports.discountCouponsValidation = require('./discountCoupons.validation');
+module.exports.bidsValidation = require('./bids.validation');
+module.exports.transactionValidation = require('./transaction.validation');
+module.exports.authValidation = require('./auth.validation');

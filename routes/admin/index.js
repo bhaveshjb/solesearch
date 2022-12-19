@@ -1,0 +1,24 @@
+import express from 'express';
+import userRoutes from './v1/user/user.route';
+import adminUsersRoutes from './v1/adminUsers/adminUsers.route';
+import productRoutes from './v1/product/product.route';
+import subscriptionRoutes from './v1/subscription/subscription.route';
+import verifiedSellersRoutes from './v1/verifiedSellers/verifiedSellers.route';
+import flakersRoutes from './v1/flakers/flakers.route';
+import discountCouponsRoutes from './v1/discountCoupons/discountCoupons.route';
+import bidsRoutes from './v1/bids/bids.route';
+import transactionRoutes from './v1/transaction/transaction.route';
+import authRoutes from './v1/auth/auth.route';
+
+const router = express.Router();
+router.use('/user', userRoutes);
+router.use('/adminUsers', adminUsersRoutes);
+router.use('/product', productRoutes);
+router.use('/subscription', subscriptionRoutes);
+router.use('/verifiedSellers', verifiedSellersRoutes);
+router.use('/flakers', flakersRoutes);
+router.use('/discountCoupons', discountCouponsRoutes);
+router.use('/bids', bidsRoutes);
+router.use('/transaction', transactionRoutes);
+router.use('/auth', authRoutes);
+module.exports = router;

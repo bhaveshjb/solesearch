@@ -1,0 +1,12 @@
+module.exports.User = require('./user.model');
+module.exports.AdminUsers = require('./adminUsers.model');
+module.exports.Product = require('./product.model');
+module.exports.Subscription = require('./subscription.model');
+module.exports.VerifiedSellers = require('./verifiedSellers.model');
+module.exports.Flakers = require('./flakers.model');
+module.exports.DiscountCoupons = require('./discountCoupons.model');
+module.exports.Bids = require('./bids.model');
+module.exports.Transaction = require('./transaction.model');
+module.exports.Token = require('./token.model');
+module.exports.Enum = require('./enum.model');
+module.exports.plugins = require('./plugins');
