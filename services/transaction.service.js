@@ -74,3 +74,21 @@ export async function removeManyTransaction(filter) {
   const transaction = await Transaction.deleteMany(filter);
   return transaction;
 }
+export async function getRecentlySoldOrders() {
+  const aggregate = [
+    {
+      $match: { success: true },
+    },
+    {
+      $sort: { ordered_at: -1 },
+    },
+    {
+      $limit: 50,
+    },
+    {
+      $project: { slug: 1, name: 1 },
+    },
+  ];
+  const soldProducts = await Transaction.aggregate(aggregate);
+  return soldProducts;
+}

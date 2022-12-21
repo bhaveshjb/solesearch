@@ -1,5 +1,8 @@
 import { productService } from 'services';
 import { catchAsync } from 'utils/catchAsync';
+import { getTrendingBids } from '../../services/bids.service';
+import { Product } from '../../models';
+import { getRecentlySoldOrders } from '../../services/transaction.service';
 
 export const get = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -54,6 +57,13 @@ export const panelAddProduct = catchAsync(async (req, res) => {
 
   await productService.updateBuyerIndexProducts(oldSlug, body);
   // todo: update images to cloudinary
+  body.product_id = new Date();
+  await productService.updateSellerAlgolia(body);
+  return res.send({ results: 'done' });
+});
+export const panelDeleteProduct = catchAsync(async (req, res) => {
+  const { body } = req;
+  await productService.deleteProductDetails(body);
   return res.send({ results: 'done' });
 });
 
@@ -122,4 +132,78 @@ export const remove = catchAsync(async (req, res) => {
   };
   const product = await productService.removeProduct(filter);
   return res.send({ results: product });
+});
+export const getTrendingProducts = catchAsync(async (req, res) => {
+  const products = await getTrendingBids();
+  const sneakers = [];
+  const streetwear = [];
+  products.map(async (prod) => {
+    const result = await Product.aggregate([
+      { $match: { slug: prod._id.slug, product_listed_on_dryp: true, inactive: false, customer_ordered: false } },
+      {
+        $group: {
+          _id: { product_type: '$product_type' },
+          price: {
+            $min: '$price',
+          },
+        },
+      },
+    ]);
+    if (result) {
+      if (result[0]._id.product_type === 'Sneakers') {
+        sneakers.push(prod._id.slug, prod._id.name, prod._id.price, prod.count);
+      } else if (result[0]._id.product_type === 'Streetwear') {
+        streetwear.push(prod._id.slug, prod._id.name, prod._id.price, prod.count);
+      }
+    }
+  });
+  return res.send({ sneakers, streetwear });
+});
+export const getRecentlySoldProducts = catchAsync(async (req, res) => {
+  const products = await getRecentlySoldOrders();
+  const sneakers = [];
+  products.map(async (prod) => {
+    const result = await Product.aggregate([
+      {
+        $match: {
+          slug: prod.slug,
+          product_listed_on_dryp: true,
+          inactive: false,
+          customer_ordered: false,
+          product_type: 'Sneakers',
+        },
+      },
+      {
+        $group: {
+          _id: { product_type: '$product_type' },
+          price: {
+            $min: '$price',
+          },
+        },
+      },
+    ]);
+    if (result) {
+      sneakers.push(prod.slug, prod.name, result[0].price);
+    }
+  });
+  return res.send({ products: sneakers });
+});
+export const getOnSaleProducts = catchAsync(async (req, res) => {
+  const products = await Product.aggregate([
+    { $match: { product_listed_on_dryp: true, inactive: false, customer_ordered: false, product_type: 'Auction' } },
+    {
+      $group: {
+        _id: { slug: '$slug', name: '$name' },
+        count: { $sum: 1 },
+        price: {
+          $min: '$price',
+        },
+      },
+    },
+  ]);
+  const result = [];
+  products.map(async (prod) => {
+    result.push(prod._id.slug, prod._id.name, prod.price, prod.count);
+  });
+  return res.send({ products: result });
 });

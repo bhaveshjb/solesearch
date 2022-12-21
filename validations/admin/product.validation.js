@@ -21,6 +21,12 @@ export const panelAddProduct = {
     slug: Joi.string(),
   }),
 };
+export const panelDeleteProduct = {
+  body: Joi.object().keys({
+    _id: Joi.string().required(),
+    slug: Joi.string().required(),
+  }),
+};
 export const addNewProduct = {
   body: Joi.object().keys({
     nickname: Joi.string(),

@@ -74,3 +74,15 @@ export async function removeManyBids(filter) {
   const bids = await Bids.deleteMany(filter);
   return bids;
 }
+
+export async function getTrendingBids() {
+  const aggregate = [
+    { $match: { active: true } },
+    {
+      $group: { _id: { slug: '$slug', name: '$name' }, count: { $sum: 1 } },
+    },
+  ];
+  const bids = await Bids.aggregate(aggregate);
+
+  return bids;
+}

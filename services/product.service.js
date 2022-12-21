@@ -46,6 +46,25 @@ export async function createProduct(body) {
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }
+export async function deleteProductDetails(productDetails) {
+  try {
+    const { slug } = productDetails;
+    const id = productDetails._id;
+
+    if (slug) {
+      const body = { query: { match: { 'slug.keyword': slug } } };
+      esclient.deleteByQuery({ index: 'buyer', body });
+      esclient.delete({ index: 'seller', id });
+    } else {
+      esclient.delete({ index: 'seller', id });
+    }
+
+    return { success: 'Product deleted' };
+  } catch (error) {
+    logger.error('error in deleting Product:', error.message);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
+}
 
 export async function getProductDetails(slug) {
   const query = {
@@ -159,7 +178,6 @@ export async function sellDecline(id) {
   // TODO: send email
   return product;
 }
-
 export async function updateBuyerIndexProducts(slug) {
   try {
     const query = {
@@ -172,6 +190,18 @@ export async function updateBuyerIndexProducts(slug) {
     };
     const product = await esclient.search({ index: 'buyer', body: query });
     return product;
+  } catch (error) {
+    logger.error('error in updateBuyerIndexProducts:', error.message);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
+}
+export async function updateSellerAlgolia(productDetails) {
+  try {
+    const objectID = productDetails._id;
+    const productDetail = productDetails;
+    delete productDetail._id;
+    await esclient.update({ index: 'seller', id: objectID, body: { doc: productDetail } });
+    return { message: 'successfully seller algolia updated' };
   } catch (error) {
     logger.error('error in updateBuyerIndexProducts:', error.message);
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);

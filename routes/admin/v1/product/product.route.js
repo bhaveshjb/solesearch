@@ -12,6 +12,12 @@ router
    * */
   .post(auth(), validate(productValidation.panelAddProduct), productController.panelAddProduct);
 router
+  .route('/panel-delete-product')
+  /**
+   * delete-product from panel
+   * */
+  .post(auth(), validate(productValidation.panelDeleteProduct), productController.panelDeleteProduct);
+router
   .route('/add-new-product')
   /**
    *addProduct
@@ -90,4 +96,23 @@ router
    * reject-review
    * */
   .patch(auth('admin'), validate(productValidation.rejectSellProduct), productController.rejectSellProduct);
+router
+  .route('/trending')
+  /**
+   *
+   * */
+  .get(auth('admin'), productController.getTrendingProducts);
+router
+  .route('/recently-sold')
+  /**
+   *
+   * */
+  .get(auth('admin'), productController.getRecentlySoldProducts);
+router
+  .route('/on-sale')
+  /**
+   *
+   * */
+  .get(auth('admin'), productController.getOnSaleProducts);
+
 export default router;
