@@ -1,8 +1,43 @@
 import ApiError from 'utils/ApiError';
 import httpStatus from 'http-status';
-import { Product } from 'models';
+import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
 import { esclient } from '../utils/elasticSearch';
+
+async function getOriginalPrice(productPrice, isBid = false) {
+  let price = Math.floor(productPrice);
+  if (isBid) {
+    const shippingCost = 300;
+    const shippingCostPlusTaxes = shippingCost + 0.18 * shippingCost;
+    price -= shippingCostPlusTaxes;
+    price = Math.floor(price / 1.0354);
+    const commission = price * 0.1;
+    const gst = commission * 0.18;
+    price = Math.floor(price - (commission + gst));
+  } else {
+    const commission = price * 0.1;
+    const gst = commission * 0.18;
+    price = Math.floor(price - (commission + gst));
+  }
+  return price;
+}
+
+export async function getObjectByProductId(productId) {
+  const query = {
+    query: {
+      match: {
+        'product_id.keyword': productId,
+      },
+    },
+  };
+  const product = await esclient.search({ index: 'buyer', body: query });
+  if (product.hits.total.value === 0) {
+    return { found: false };
+  }
+  const objectId = product.hits.hits[0]._id;
+  esclient.delete({ index: 'buyer', id: objectId });
+  return { found: true };
+}
 
 export async function getProductById(id, options) {
   const product = await Product.findById(id, options);
@@ -145,6 +180,39 @@ export async function sellProductService(productData, userData) {
   await Product.create(productDetail);
   return { message: 'Product added for review' };
 }
+export async function getStoreFront(filter) {
+  const options = {};
+  const products = await getProductList(filter, options);
+  const productList = [];
+  products.map(async (product) => {
+    product.price = await getOriginalPrice(product.price);
+    productList.push(product);
+    return productList;
+  });
+
+  return productList;
+}
+export async function makeStoreFrontInactive(filter, options) {
+  const products = await updateProduct(filter, { inactive: true }, options);
+  if (products.product_listed_on_dryp) {
+    await getObjectByProductId(filter.product_id);
+  }
+  return products;
+}
+export async function getSoldProducts(filter) {
+  const products = await getProductList(filter);
+  const soldProducts = [];
+  products.map(async (product) => {
+    const bid = await Bids.findOne({ accepted: true, seller: filter.seller_email, slug: product.slug, size: product.size });
+    if (bid) {
+      product.price = getOriginalPrice(bid.price, true);
+    } else {
+      product.price = getOriginalPrice(product.price);
+    }
+    soldProducts.push(product);
+  });
+  return soldProducts;
+}
 
 export async function listProductReview() {
   const filter = {
@@ -240,4 +308,9 @@ export async function removeProduct(filter) {
 export async function removeManyProduct(filter) {
   const product = await Product.deleteMany(filter);
   return product;
+}
+
+export async function getOrders(filter) {
+  const order = await Transaction.find(filter);
+  return order;
 }

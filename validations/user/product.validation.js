@@ -99,3 +99,25 @@ export const paginatedProduct = {
     })
     .unknown(true),
 };
+
+export const sellProduct = {
+  body: Joi.object().keys({
+    _id: Joi.string().required(),
+    size: Joi.string().required(),
+    price: Joi.number().required(),
+  }),
+};
+
+export const storeFrontInactive = {
+  body: Joi.object().keys({
+    product_id: Joi.string().required(),
+  }),
+};
+export const notFoundForm = {
+  body: Joi.object().keys({
+    size: Joi.string(),
+    brand_name: Joi.string().required(),
+    name: Joi.string().required(),
+    colourway: Joi.string().required(),
+  }),
+};
