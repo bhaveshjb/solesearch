@@ -70,5 +70,11 @@ router
    * */
   .put(auth('user'), validate(userValidation.wishList), userController.updateWishList)
   .get(auth('user'), userController.wishList);
+router
+  .route('/customer-support')
+  /**
+   * customer-support
+   * */
+  .post(auth('user'), validate(userValidation.customerSupport), userController.customerSupport);
 
 export default router;

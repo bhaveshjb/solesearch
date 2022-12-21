@@ -8,6 +8,12 @@ export const createSubscription = {
     email: Joi.string().email(),
   }),
 };
+export const subscribe = {
+  body: Joi.object().keys({
+    collections: Joi.string().required(),
+    email: Joi.string().email().required(),
+  }),
+};
 
 export const updateSubscription = {
   body: Joi.object().keys({

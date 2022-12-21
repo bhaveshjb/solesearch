@@ -16,6 +16,12 @@ router
    * */
   .get(auth('user'), validate(subscriptionValidation.getSubscription), subscriptionController.list);
 router
+  .route('/subscribers')
+  /**
+   * subscribers
+   * */
+  .post(auth('user'), validate(subscriptionValidation.subscribe), subscriptionController.subscribe);
+router
   .route('/paginated')
   /**
    * getSubscriptionPaginated
