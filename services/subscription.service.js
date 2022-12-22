@@ -1,4 +1,5 @@
 import { Subscription } from 'models';
+import { sendEmail } from './email.service';
 
 export async function getSubscriptionById(id, options) {
   const subscription = await Subscription.findById(id, options);
@@ -43,4 +44,23 @@ export async function removeSubscription(filter) {
 export async function removeManySubscription(filter) {
   const subscription = await Subscription.deleteMany(filter);
   return subscription;
+}
+export async function addSubscription(body) {
+  const { collections } = body;
+  const { email } = body;
+  try {
+    const subject = 'Subscription to SoleSearchIndia';
+    const to = email;
+    const text = `"You are subscribed to ${collections} collection on SoleSearch.\nEnjoy shopping"`;
+    const subscribed = await Subscription.findOne({ collections, email });
+    if (!subscribed) {
+      await Subscription.create({ collections, email });
+      await sendEmail({ to, subject, text, isHtml: false });
+      return { message: 'Subscription added' };
+    }
+    await sendEmail({ to, subject, text, isHtml: false });
+    return { message: 'Subscription added' };
+  } catch (e) {
+    throw new Error(`addSubscription error: ${e.message}`);
+  }
 }

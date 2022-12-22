@@ -144,3 +144,14 @@ export const wishList = {
     wishListAction: Joi.boolean().required(),
   }),
 };
+export const customerSupport = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string(),
+    phone_number: Joi.string().required(),
+    issue_type: Joi.string().required(),
+    reference_number: Joi.string().required(),
+    description: Joi.string().required(),
+  }),
+};

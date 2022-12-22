@@ -55,3 +55,13 @@ export const remove = catchAsync(async (req, res) => {
   const subscription = await subscriptionService.removeSubscription(filter);
   return res.send({ results: subscription });
 });
+
+export const subscribe = catchAsync(async (req, res) => {
+  const { body } = req;
+  try {
+    const getSubscribe = await subscriptionService.addSubscription(body);
+    return res.send({ message: getSubscribe });
+  } catch (e) {
+    throw new Error(`error from subscribe: ${e.message}`);
+  }
+});

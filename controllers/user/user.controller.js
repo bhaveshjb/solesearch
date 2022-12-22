@@ -1,5 +1,6 @@
 import { userService } from 'services';
 import { catchAsync } from 'utils/catchAsync';
+import { sendEmail } from '../../services/email.service';
 
 export const get = catchAsync(async (req, res) => {
   const { userId } = req.params;
@@ -125,4 +126,21 @@ export const wishList = catchAsync(async (req, res) => {
   const options = {};
   const userWishList = await userService.getWishlist(filter, options);
   return res.send({ results: userWishList });
+});
+export const customerSupport = catchAsync(async (req, res) => {
+  const { body } = req;
+  const firstName = body.first_name;
+  const phoneNumber = body.phone_number;
+  const issueType = body.issue_type;
+  const referenceNumber = body.reference_number;
+
+  const { email, description } = body;
+  const emailContentText = `1. First name: ${firstName} \n2. Email address: ${email}\n3. Phone number: ${phoneNumber}\n4. Issue Type: ${issueType}\n6.Reference Number: ${referenceNumber}\n7. Description: ${description}`;
+  const subject = 'Customer Request';
+  const acknowledgmentText =
+    'Your request has been acknowledged and is currently being processed.Our customer agent will get back to you shortly.';
+  const helpdesk = 'support@solesearchindia.zohodesk.in';
+  await sendEmail({ helpdesk, subject, emailContentText, isHtml: false });
+  await sendEmail({ email, subject, acknowledgmentText, isHtml: false });
+  return res.send({ message: 'done' });
 });
