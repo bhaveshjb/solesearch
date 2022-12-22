@@ -141,3 +141,37 @@ export const paginatedProduct = {
     })
     .unknown(true),
 };
+export const productsWithFilters = {
+  body: Joi.object().keys({
+    size: Joi.number(),
+    from: Joi.number(),
+    query: Joi.object(),
+    sort: Joi.object(),
+  }),
+};
+export const productFilterByQuery = {
+  body: Joi.object().keys({
+    size: Joi.number(),
+    from: Joi.number(),
+    match: Joi.object().required(),
+    sort_by: Joi.object().required(),
+  }),
+};
+export const filters = {
+  body: Joi.object().keys({
+    query: Joi.object(),
+    aggs: Joi.object(),
+  }),
+};
+export const queryResults = {
+  params: Joi.object().keys({
+    query: Joi.string().required(),
+  }),
+};
+export const search = {
+  params: Joi.object().keys({
+    index: Joi.string().required(),
+    query_string: Joi.string().required(),
+    size: Joi.number().required(),
+  }),
+};

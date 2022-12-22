@@ -6,6 +6,12 @@ import auth from 'middlewares/auth';
 
 const router = express.Router();
 router
+  .route('/check')
+  /**
+   * check
+   * */
+  .post(auth(), productController.check);
+router
   .route('/panel-add-product')
   /**
    * addProduct to panel
@@ -114,5 +120,34 @@ router
    *
    * */
   .get(auth('admin'), productController.getOnSaleProducts);
-
+router
+  .route('/filters')
+  /**
+   *
+   * */
+  .post(auth('admin'), validate(productValidation.productsWithFilters), productController.productsWithFilters);
+router
+  .route('/filters/new')
+  /**
+   *
+   * */
+  .post(auth('admin'), validate(productValidation.productFilterByQuery), productController.productFilterByQuery);
+router
+  .route('/filter')
+  /**
+   *
+   * */
+  .post(auth('admin'), validate(productValidation.filters), productController.filters);
+router
+  .route('/query-results/:query')
+  /**
+   *
+   * */
+  .get(auth('admin'), validate(productValidation.queryResults), productController.queryResults);
+router
+  .route('/search/:index/:query_string/:size')
+  /**
+   *
+   * */
+  .get(auth('admin'), validate(productValidation.search), productController.search);
 export default router;

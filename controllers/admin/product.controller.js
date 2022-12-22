@@ -4,6 +4,15 @@ import { getTrendingBids } from '../../services/bids.service';
 import { Product } from '../../models';
 import { getRecentlySoldOrders } from '../../services/transaction.service';
 
+export const check = catchAsync(async (req, res) => {
+  const status = await productService.productUpdate();
+  return res.send({ message: status });
+});
+export const sneakersList = catchAsync(async (req, res) => {
+  const status = await productService.productUpdate();
+  return res.send({ message: status });
+});
+
 export const get = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const filter = {
@@ -206,4 +215,30 @@ export const getOnSaleProducts = catchAsync(async (req, res) => {
     result.push(prod._id.slug, prod._id.name, prod.price, prod.count);
   });
   return res.send({ products: result });
+});
+export const productsWithFilters = catchAsync(async (req, res) => {
+  const { body } = req;
+  const products = await productService.getProducts(body);
+  return res.send({ products });
+});
+export const productFilterByQuery = catchAsync(async (req, res) => {
+  const { body } = req;
+  const products = await productService.productFilter(body);
+  return res.send({ products });
+});
+export const filters = catchAsync(async (req, res) => {
+  const { body } = req;
+  const products = await productService.getFilters(body);
+  return res.send({ products });
+});
+export const queryResults = catchAsync(async (req, res) => {
+  const { query } = req.params;
+  const products = await productService.getQueryResults(query);
+  return res.send({ products });
+});
+export const search = catchAsync(async (req, res) => {
+  const { index, size } = req.params;
+  const queryString = req.params.query_string;
+  const products = await productService.getSearch(index, queryString, size);
+  return res.send({ products });
 });
