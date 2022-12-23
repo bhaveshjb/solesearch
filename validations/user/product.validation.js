@@ -121,3 +121,35 @@ export const notFoundForm = {
     colourway: Joi.string().required(),
   }),
 };
+
+export const makePayment = {
+  body: Joi.object().keys({
+    product_id: Joi.string().required(),
+    size: Joi.string().required(),
+    name: Joi.string().required(),
+    discount: Joi.string(),
+    slug: Joi.string().required(),
+    price: Joi.string().required(),
+    gst: Joi.string().required(),
+    email: Joi.string().required(),
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    phone_number: Joi.string().required(),
+    building_name: Joi.string(),
+    house_flat_number: Joi.string().required(),
+    street_name: Joi.string().required(),
+    landmark: Joi.string(),
+    city_village: Joi.string(),
+    state: Joi.string().required(),
+    country: Joi.string().required(),
+    zip: Joi.string().required(),
+  }),
+};
+
+export const verifyPayment = {
+  body: Joi.object().keys({
+    razorpay_payment_id: Joi.string().required(),
+    razorpay_order_id: Joi.string().required(),
+    razorpay_signature: Joi.string().required(),
+  }),
+};
