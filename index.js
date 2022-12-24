@@ -4,6 +4,7 @@ import config from 'config/config';
 import { logger } from 'config/logger';
 import app from './app';
 
+require('./migrateMongo')();
 // checkConnection();
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {

@@ -39,6 +39,7 @@
     "joi-objectid": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
+    "migrate-mongo": "^9.0.0",
     "mime-types": "^2.1.32",
     "minio": "^7.0.18",
     "moment": "^2.29.1",
@@ -59,6 +60,7 @@
     "stripe": "^8.169.0",
     "swagger-ui-express": "^4.1.6",
     "twilio": "^3.67.0",
+    "utf8": "^3.0.0",
     "winston": "^3.2.1",
     "xss-clean": "^0.1.1",
     "yamljs": "^0.3.0"

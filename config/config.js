@@ -8,6 +8,8 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
     MONGODB_URL: Joi.string().required().description('Mongo DB url'),
+    SUPERUSER_USERNAME: Joi.string().required().description('Admin userName'),
+    SUPERUSER_PASSWORD: Joi.string().required().description('Admin userName'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
@@ -69,5 +71,9 @@ export default {
   facebook: {
     clientID: envVars.FACEBOOK_CLIENT_ID,
     clientSecret: envVars.FACEBOOK_CLIENT_SECRET,
+  },
+  superUser: {
+    username: envVars.SUPERUSER_USERNAME,
+    password: envVars.SUPERUSER_PASSWORD,
   },
 };

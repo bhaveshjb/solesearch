@@ -1,15 +1,23 @@
 import { productService } from 'services';
 import { catchAsync } from 'utils/catchAsync';
+// import csvtojson from 'csvtojson';
 import { getTrendingBids } from '../../services/bids.service';
 import { Product } from '../../models';
-import { getRecentlySoldOrders } from '../../services/transaction.service';
+import { createTransaction, getRecentlySoldOrders, verifyTransaction } from '../../services/transaction.service';
+import { redisClient } from '../../utils/redis';
+import { logger } from '../../config/logger';
+import { updateProduct } from '../../services/product.service';
+import { sendEmail } from '../../services/email.service';
+
+const utf8 = require('utf8');
 
 export const check = catchAsync(async (req, res) => {
   const status = await productService.productUpdate();
   return res.send({ message: status });
 });
 export const sneakersList = catchAsync(async (req, res) => {
-  const status = await productService.productUpdate();
+  const filter = {};
+  const status = await productService.getProductList(filter);
   return res.send({ message: status });
 });
 
@@ -26,6 +34,12 @@ export const productDetail = catchAsync(async (req, res) => {
   const { slug } = req.params;
   const product = await productService.getProductDetails(slug);
   return res.send({ results: product });
+});
+
+export const productDetailsById = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const product = await productService.getProductDetailsById(id);
+  return res.send({ product });
 });
 
 export const list = catchAsync(async (req, res) => {
@@ -66,7 +80,8 @@ export const panelAddProduct = catchAsync(async (req, res) => {
 
   await productService.updateBuyerIndexProducts(oldSlug, body);
   // todo: update images to cloudinary
-  body.product_id = new Date();
+  body.product_id = utf8.encode(`${body.name} ${new Date()}`); //
+  console.log('body.product_id=> ', body.product_id);
   await productService.updateSellerAlgolia(body);
   return res.send({ results: 'done' });
 });
@@ -84,8 +99,18 @@ export const addNewProduct = catchAsync(async (req, res) => {
   body.brand_name = titleCase(body.brand_name);
 
   // add method  upload_to_cloudinary to add upload images in cloudinary
-  const product = await productService.createProduct(body);
-  return res.send({ results: product });
+  await productService.createProduct(body);
+  return res.send({ message: 'Product added successfully', error: false });
+});
+export const bulkAddNewProduct = catchAsync(async (req, res) => {
+  console.log('req.file=> ', req.files);
+  const { file } = req.file;
+  // console.log('files=> ', files.file);
+  // const usersArray = await csvtojson().fromFile(file.path);
+  // console.log('usersArray=> ', usersArray);
+  // await productService.readFileAndGetUsers(files.file);
+  await productService.readFileAndGetUsers(file);
+  return res.send({ message: 'Product added successfully', error: false });
 });
 
 export const selectedProduct = catchAsync(async (req, res) => {
@@ -105,6 +130,92 @@ export const sellProduct = catchAsync(async (req, res) => {
   const userData = req.user;
   const product = await productService.sellProductService(productData, userData);
   return res.send({ results: product });
+});
+export const storeFront = catchAsync(async (req, res) => {
+  const filter = {
+    seller_email: req.user.email,
+    inactive: false,
+    sold: false,
+  };
+  const product = await productService.getStoreFront(filter);
+  return res.send({ results: product });
+});
+export const storeFrontInactive = catchAsync(async (req, res) => {
+  const productId = req.body.product_id;
+  const filter = {
+    product_id: productId,
+  };
+  const options = { new: true };
+  const product = await productService.makeStoreFrontInactive(filter, options);
+  return res.send({ results: product });
+});
+export const soldProduct = catchAsync(async (req, res) => {
+  const filter = {
+    seller_email: req.user.email,
+    inactive: false,
+    customer_ordered: true,
+  };
+  const product = await productService.getSoldProducts(filter);
+  return res.send({ results: product });
+});
+export const notFoundForm = catchAsync(async (req, res) => {
+  const { body } = req;
+  const brandName = body.brand_name;
+  const { size, name, colourway } = body;
+  const emailContentText = `Request from user ${req.user.email} for a product with details:\n1. Size: ${size}\n2. Brand name: ${brandName}\n3. Name: ${name}\n4. Colourway: ${colourway}`;
+  const subject = 'Product request';
+  const to = ' info@solesearchindia.com';
+  await sendEmail({ to, subject, emailContentText });
+  return res.send({ message: 'success' });
+});
+
+export const orders = catchAsync(async (req, res) => {
+  const filter = {
+    buyer: req.user.email,
+    is_bid: false,
+  };
+  const order = await productService.getOrders(filter);
+  return res.send({ orders: order });
+});
+const checkIfProductBlocked = async (productId) => {
+  const checkProduct = await redisClient.get(productId);
+  if (checkProduct) {
+    return true;
+  }
+  return false;
+};
+const blockProduct = async (productId) => {
+  await redisClient.set(productId, true, { ex: 180 });
+};
+
+export const makePayment = catchAsync(async (req, res) => {
+  const { body } = req;
+  if (!(await checkIfProductBlocked(body.product_id))) {
+    body.buyer = req.user.email;
+    await blockProduct(body.product_id);
+    const order = await createTransaction(body);
+    logger.info(`order generated: ${order.order_id}`);
+    return res.send({ message: 'Transaction order id generated.', order_id: order.order_id });
+  }
+  return res.send({ message: 'Product Blocked', blocked: true });
+});
+
+export const productSold = async (productId) => {
+  await updateProduct({ product_id: productId }, { customer_ordered: true });
+  // todo:send_email_to_seller
+  return { error: false };
+};
+
+export const verifyPayment = catchAsync(async (req, res) => {
+  const { body } = req;
+  const order = await verifyTransaction(body);
+  if (!order.error) {
+    const result = await productSold(order.product_id);
+    if (!result.error) {
+      return res.send({ message: 'Payment Verified.', error: false });
+    }
+  }
+  return res.send({ message: 'Payment not Verified.', error: true });
 });
 export const productReview = catchAsync(async (req, res) => {
   const { user } = req;

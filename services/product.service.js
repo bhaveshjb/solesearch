@@ -1,6 +1,8 @@
 import ApiError from 'utils/ApiError';
 import httpStatus from 'http-status';
 import { Bids, Product, Transaction } from 'models';
+// import csvtojson from 'csvtojson';
+// import Joi from 'joi';
 import { logger } from '../config/logger';
 import { esclient } from '../utils/elasticSearch';
 
@@ -101,6 +103,76 @@ export async function createProduct(body) {
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }
+// export async function readFileAndGetUsers(file) {
+//   console.log('file in the funtion', file);
+//   let usersArray = [];
+//   const excelExts = ['.xls', '.xlsx'];
+//   const { name } = file;
+//   console.log('name=> ', name);
+//   const isExcelSheet = excelExts.some((ext) => name.endsWith(ext));
+//   if (isExcelSheet) {
+//     const workbook = XLSX.readFile(file.path);
+//     const firstSheetName = workbook.SheetNames[0];
+//     const worksheet = workbook.Sheets[firstSheetName];
+//     if (!worksheet.A1) {
+//       throw new ApiError('First row must have column names', httpStatus.BAD_REQUEST, true);
+//     }
+//     if (worksheet.A1 && worksheet.A1.v.toLowerCase().trim() !== 'email') {
+//       if (!worksheet.B1 || (worksheet.B1 && !worksheet.B1.v)) {
+//         throw new ApiError('First row must have column names', httpStatus.BAD_REQUEST, true);
+//       }
+//     }
+//     // usersArray = XLSX.utils.sheet_to_json(worksheet);
+//   } else {
+//     usersArray = await csvtojson().fromFile(file.tempFilePath);
+//     console.log('usersArray=> ', usersArray);
+//   }
+//   if (!usersArray.length) {
+//     throw new ApiError('File is empty! please enter at least one record', httpStatus.BAD_REQUEST, true);
+//   }
+//   const keys = Object.keys(usersArray[0]);
+//   if (!keys.includes('email')) {
+//     throw new ApiError('email column not found in the file', httpStatus.BAD_REQUEST, true);
+//   }
+//   const validUsers = [];
+//   const invalidUsers = [];
+//   /* eslint-disable no-param-reassign */
+//   usersArray.forEach((user) => {
+//     const emailValidation = Joi.string().email().required().validate(user.email);
+//     if (emailValidation && emailValidation.error) {
+//       invalidUsers.push(user);
+//       return false;
+//     }
+//     if (user.role) {
+//       const role = user.role.toLowerCase();
+//       if (['admin', 'user', 'superadmin'].includes(role)) {
+//         user.role = role === 'superadmin' ? 'superAdmin' : role;
+//       } else {
+//         invalidUsers.push(user);
+//         return false;
+//       }
+//     } else if (!user.role) {
+//       user.role = 'user';
+//     }
+//     user.longitude = user.longitude ? parseFloat(user.longitude) : 0;
+//     user.latitude = user.latitude ? parseFloat(user.latitude) : 0;
+//     if (user.longitude) {
+//       if (user.longitude < -180 || user.longitude > 180) {
+//         user.longitude = 0;
+//       }
+//     }
+//     if (user.latitude) {
+//       if (user.latitude < -90 || user.latitude > 90) {
+//         user.latitude = 0;
+//       }
+//     }
+//     validUsers.push(user);
+//     return true;
+//   });
+//   return { validUsers, invalidUsers };
+//   /* eslint-enable no-param-reassign */
+// }
+
 export async function deleteProductDetails(productDetails) {
   try {
     const { slug } = productDetails;
@@ -131,6 +203,13 @@ export async function getProductDetails(slug) {
   };
   const product = await esclient.search({ index: 'seller', body: query });
   return product.hits.hits[0]._source;
+}
+export async function getProductDetailsById(productId) {
+  const product = await getOne({ product_id: productId });
+  if (product) {
+    product.seller_email = null;
+  }
+  return product;
 }
 
 export async function getProductCollection() {
@@ -277,6 +356,7 @@ export async function updateBuyerIndexProducts(slug) {
       },
     };
     const product = await esclient.search({ index: 'buyer', body: query });
+    // todo:  update buyer index, pending due to not get the logic used in forloop
     return product;
   } catch (error) {
     logger.error('error in updateBuyerIndexProducts:', error.message);
