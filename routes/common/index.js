@@ -6,6 +6,7 @@ import { authValidation, subscriptionValidation, userValidation } from '../../va
 import { authController, subscriptionController, userController } from '../../controllers/user';
 import { productValidation } from '../../validations/admin';
 
+// const upload = require('multer')({ dest: '/tmp' });
 const productRoute = require('./product/product.route');
 
 const router = express.Router();
@@ -15,16 +16,20 @@ router.route('/sneakers').post(auth(), productController.sneakersList);
 router.post('/register', validate(authValidation.register), authController.register);
 router.put('/user-update', auth(), authController.updateUserInfo);
 router.post('/login', validate(authValidation.login), authController.login);
+router.patch('/set-new-password', auth(), validate(authValidation.userSetPassword), authController.userSetPassword);
 router.patch('/verifyUser', auth(), authController.verifyUser);
 router.post('/logout', auth(), validate(authValidation.logout), authController.logout);
 router
   .route('/wish-list')
-  .put(auth(), validate(userValidation.wishList), userController.updateWishList)
+  .patch(auth(), validate(userValidation.wishList), userController.updateWishList)
   .get(auth(), userController.wishList);
 
 // Elastic search GET APIs from vue frontend
 router.route('/collection').get(auth(), productController.collection);
 router.route('/search/:index/:query_string/:size').get(auth(), validate(productValidation.search), productController.search);
+router
+  .route('/selected-product/:slug')
+  .get(auth(), validate(productValidation.getSelectedProduct), productController.selectedProduct);
 router
   .route('/related-products/:brand')
   .get(auth(), validate(productValidation.getRelatedProducts), productController.relatedProducts);
