@@ -1,4 +1,5 @@
 import express from 'express';
+import passport from 'passport';
 import auth from '../../middlewares/auth';
 import validate from '../../middlewares/validate';
 import { productController } from '../../controllers/admin';
@@ -19,6 +20,12 @@ router.post('/login', validate(authValidation.login), authController.login);
 router.patch('/set-new-password', auth(), validate(authValidation.userSetPassword), authController.userSetPassword);
 router.patch('/verifyUser', auth(), authController.verifyUser);
 router.post('/logout', auth(), validate(authValidation.logout), authController.logout);
+router.post(
+  '/facebook-signup-login',
+  validate(authValidation.faceBookLogin),
+  passport.authenticate('facebook-token', { session: false }),
+  authController.socialLogin
+);
 router
   .route('/wish-list')
   .patch(auth(), validate(userValidation.wishList), userController.updateWishList)
