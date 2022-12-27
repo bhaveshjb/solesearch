@@ -12,7 +12,6 @@ import { sendEmail } from '../../services/email.service';
 import ApiError from '../../utils/ApiError';
 
 const csv = require('csvtojson');
-const utf8 = require('utf8');
 
 export const check = catchAsync(async (req, res) => {
   const status = await productService.productUpdate();
@@ -83,7 +82,7 @@ export const panelAddProduct = catchAsync(async (req, res) => {
 
   await productService.updateBuyerIndexProducts(oldSlug, body);
   // todo: update images to cloudinary
-  body.product_id = utf8.encode(`${body.name} ${Date.now()}`); //
+  body.product_id = encodeURIComponent(`${body.name}${Date.now()}`); //
   await productService.updateSellerAlgolia(body);
   return res.send({ results: 'done' });
 });
@@ -136,6 +135,44 @@ export const bulkAddNewProduct = catchAsync(async (req, res) => {
     return results;
   });
   await productService.bulkAdd('seller', results);
+  return res.send({ error: false, message: 'Products added successfully.' });
+});
+
+export const bulkSellProduct = catchAsync(async (req, res) => {
+  const rawData = req.files.file.data.toString();
+  const productData = await csv({
+    noheader: true,
+    headers: ['name', 'description', 'product_type', 'gender', 'brand_name', 'color', 'price', 'size'],
+    output: 'csv',
+  }).fromString(rawData);
+  const requiredHeaders = ['name', 'description', 'product_type', 'gender', 'brand_name', 'color', 'price', 'size'];
+  const fileHeaders = productData[0].map((v) => v.toLowerCase());
+  const checkHeader = [];
+  fileHeaders.map((ele) => {
+    const result = requiredHeaders.includes(ele);
+    checkHeader.push(result);
+    return checkHeader;
+  });
+  if (checkHeader.includes(false)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Csv file headers are incorrect');
+  }
+  const results = [];
+
+  productData.map((arr) => {
+    const obj = {
+      name: arr[0],
+      story_html: arr[1],
+      product_type: arr[2],
+      gender: arr[3],
+      brand_name: arr[4],
+      color: arr[5],
+      price: arr[6],
+      size: arr[7],
+    };
+    results.push(obj);
+    return results;
+  });
+  await productService.bulkSell(req.user.email, results);
   return res.send({ error: false, message: 'Products added successfully.' });
 });
 

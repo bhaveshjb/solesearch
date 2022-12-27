@@ -62,6 +62,7 @@ router.route('/bulk/add-new-users').post(auth(), productController.bulkAddNewUse
 
 // sell products
 router.route('/sell-product').post(auth(), validate(productValidation.sellProduct), productController.sellProduct);
+router.route('/bulk/sell-product').post(auth(), productController.bulkSellProduct);
 router
   .route('/store-front')
   .get(auth(), productController.storeFront)

@@ -118,10 +118,10 @@ const ProductSchema = new mongoose.Schema(
     /**
      * objectID
      * */
-    objectID: {
-      type: String,
-      unique: true,
-    },
+    // objectID: {
+    //   type: String,
+    //   // unique: true,
+    // },
     /**
      * gender
      * */

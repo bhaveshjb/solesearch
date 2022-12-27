@@ -131,6 +131,47 @@ export async function bulkAdd(index, data) {
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }
+export async function bulkSell(sellerEmail, data) {
+  try {
+    const productsDetails = [];
+    data.map(async (product) => {
+      const { price } = product;
+      const gender = product.gender.split('-');
+      let sku;
+      if (product.sku) {
+        sku = product.sku.toLowerCase().replace(' ', '-');
+      } else {
+        sku = '';
+      }
+      product.price = 0.09 * parseInt(price, 10) + parseInt(price, 10) + 2000;
+      product.gender = gender;
+      product.price = 1000;
+      product.size = '8';
+      const encodedProductId = encodeURIComponent(`${product.name}${Date.now()}`);
+      const validatedProduct = {
+        slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
+        product_id: encodedProductId,
+        main_picture_url: 'display_picture.png',
+        product_listed_on_dryp: false,
+        customer_ordered: false,
+        product_received_on_dryp: false,
+        authenticity_check: false,
+        product_shipped_to_customer: false,
+        product_delivered: false,
+        reject_product: false,
+        sold: false,
+        inactive: false,
+        seller_email: sellerEmail,
+      };
+      productsDetails.push(Object.assign(product, validatedProduct));
+      return productsDetails;
+    });
+    await Product.insertMany(productsDetails);
+  } catch (error) {
+    logger.error('error in bulkAdd Product:', error.message);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
+}
 
 export async function deleteProductDetails(productDetails) {
   try {
@@ -173,6 +214,12 @@ export async function getProductDetails(slug) {
     },
   ];
   const productSizesPrice = await Product.aggregate(aggregate);
+  // if (productSizesPrice) {
+  //   const { sizes } = productSizesPrice[0].sizes;
+  //   const { prices } = productSizesPrice[0].prices;
+  //   const { product_ids } = productSizesPrice[0].product_ids;
+  // }
+  // todo: add least_price function
   const query = {
     query: {
       match: {
@@ -193,6 +240,7 @@ export async function getProductDetails(slug) {
       },
     },
   ]);
+
   console.log('soldPrice=> ', soldPrice);
   return product.hits.hits[0]._source;
 }
