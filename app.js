@@ -16,6 +16,8 @@ import { errorConverter, errorHandler } from 'middlewares/error';
 import sendResponse from 'middlewares/sendResponse';
 import config from 'config/config';
 import { successHandler, errorHandler as morganErrorHandler } from 'config/morgan';
+// import ejs from 'ejs';
+//  const upload = require('multer')({ dest: '/tmp' });
 
 mongoosePaginate.paginate.options = {
   customLabels: { docs: 'results', totalDocs: 'totalResults' },
@@ -42,12 +44,16 @@ app.use(sendResponse);
 // enable cors
 app.use(cors());
 app.options('*', cors());
+// app.use(upload.any());
 app.use(express.static(path.join(__dirname, '../public')));
 // jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
-// v1 api routes
-app.use('/api', routes);
+// app.set('views', path.join(__dirname, 'views/'));
+// app.set('view engine', 'ejs');
+// app.engine('html', ejs.renderFile);
+// v1 admin-panel routes
+app.use('/admin-panel', routes);
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));

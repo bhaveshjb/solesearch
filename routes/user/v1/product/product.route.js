@@ -69,4 +69,16 @@ router
    * Orders
    * */
   .get(auth('user'), productController.orders);
+router
+  .route('/buy-product')
+  /**
+   * makePayment
+   * */
+  .post(auth('user'), validate(productValidation.makePayment), productController.makePayment);
+router
+  .route('/verify-payment')
+  /**
+   * verifyPayment
+   * */
+  .post(auth('user'), validate(productValidation.verifyPayment), productController.verifyPayment);
 export default router;

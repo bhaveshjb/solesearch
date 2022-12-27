@@ -4,6 +4,8 @@ import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
 import { esclient } from '../utils/elasticSearch';
 
+const elasticbulk = require('elasticbulk');
+
 async function getOriginalPrice(productPrice, isBid = false) {
   let price = Math.floor(productPrice);
   if (isBid) {
@@ -37,6 +39,26 @@ export async function getObjectByProductId(productId) {
   const objectId = product.hits.hits[0]._id;
   esclient.delete({ index: 'buyer', id: objectId });
   return { found: true };
+}
+
+export async function productUpdate() {
+  const slugs = [
+    "nike-dunk-low-'varsity-royal'-cu1726100",
+    "air-jordan-1-high-og-'lost-and-found'-dz5485612",
+    "travis-scott-x-air-jordan-1-low-og-'reverse-mocha'-dm7866162",
+    'fragment-design-x-travis-scott-x-air-jordan-1-retro-low-dm7866140',
+    "union-la-x-air-jordan-1-retro-high-nrg-'black-toe'-bv1300106",
+    "air-jordan-1-mid-se-'black-and-white'-dh6933100",
+    "dunk-low-'pure-platinum'-dj6188001",
+    'nike-air-force-1-mid-x-off-white-black-do6290-001',
+    "nike-sb-dunk-low-'why-so-sad'-dx5549400",
+    "union-la-x-dunk-low-'passport-pack---argon'-dj9649400",
+    "yeezy-foam-runner-'onyx'-hp8739",
+  ];
+  slugs.map(async (slug) => {
+    await Product.updateMany({ slug }, { on_sale: true });
+  });
+  return 'Done';
 }
 
 export async function getProductById(id, options) {
@@ -81,6 +103,76 @@ export async function createProduct(body) {
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }
+export async function bulkAdd(index, data) {
+  try {
+    const products = [];
+    data.map((product) => {
+      let sku;
+      if (product.sku) {
+        sku = product.sku.toLowerCase().replace(' ', '-');
+      } else {
+        sku = '';
+      }
+      const addData = {
+        gender: product.gender,
+        slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
+        main_picture_url: 'display_picture.png',
+      };
+      products.push(Object.assign(product, addData));
+      return products;
+    });
+
+    await elasticbulk.import(products, {
+      index,
+      host: 'http://localhost:9200',
+    });
+  } catch (error) {
+    logger.error('error in bulkAdd Product:', error.message);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
+}
+export async function bulkSell(sellerEmail, data) {
+  try {
+    const productsDetails = [];
+    data.map(async (product) => {
+      const { price } = product;
+      const gender = product.gender.split('-');
+      let sku;
+      if (product.sku) {
+        sku = product.sku.toLowerCase().replace(' ', '-');
+      } else {
+        sku = '';
+      }
+      product.price = 0.09 * parseInt(price, 10) + parseInt(price, 10) + 2000;
+      product.gender = gender;
+      product.price = 1000;
+      product.size = '8';
+      const encodedProductId = encodeURIComponent(`${product.name}${Date.now()}`);
+      const validatedProduct = {
+        slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
+        product_id: encodedProductId,
+        main_picture_url: 'display_picture.png',
+        product_listed_on_dryp: false,
+        customer_ordered: false,
+        product_received_on_dryp: false,
+        authenticity_check: false,
+        product_shipped_to_customer: false,
+        product_delivered: false,
+        reject_product: false,
+        sold: false,
+        inactive: false,
+        seller_email: sellerEmail,
+      };
+      productsDetails.push(Object.assign(product, validatedProduct));
+      return productsDetails;
+    });
+    await Product.insertMany(productsDetails);
+  } catch (error) {
+    logger.error('error in bulkAdd Product:', error.message);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
+}
+
 export async function deleteProductDetails(productDetails) {
   try {
     const { slug } = productDetails;
@@ -102,6 +194,32 @@ export async function deleteProductDetails(productDetails) {
 }
 
 export async function getProductDetails(slug) {
+  const aggregate = [
+    {
+      $match: {
+        slug,
+        inactive: false,
+        customer_ordered: false,
+        sold: false,
+        product_listed_on_dryp: true,
+      },
+    },
+    {
+      $group: {
+        _id: '$slug',
+        sizes: { $push: '$size' },
+        prices: { $push: '$price' },
+        product_ids: { $push: '$product_id' },
+      },
+    },
+  ];
+  const productSizesPrice = await Product.aggregate(aggregate);
+  // if (productSizesPrice) {
+  //   const { sizes } = productSizesPrice[0].sizes;
+  //   const { prices } = productSizesPrice[0].prices;
+  //   const { product_ids } = productSizesPrice[0].product_ids;
+  // }
+  // todo: add least_price function
   const query = {
     query: {
       match: {
@@ -109,8 +227,29 @@ export async function getProductDetails(slug) {
       },
     },
   };
+  console.log('productSizesPrice=> ', productSizesPrice);
   const product = await esclient.search({ index: 'seller', body: query });
+  const soldPrice = await Product.aggregate([
+    { $match: { slug, customer_ordered: true } },
+    {
+      $group: {
+        _id: { slug: '$slug', size: '$size' },
+        price: {
+          $min: '$price',
+        },
+      },
+    },
+  ]);
+
+  console.log('soldPrice=> ', soldPrice);
   return product.hits.hits[0]._source;
+}
+export async function getProductDetailsById(productId) {
+  const product = await getOne({ product_id: productId });
+  if (product) {
+    product.seller_email = null;
+  }
+  return product;
 }
 
 export async function getProductCollection() {
@@ -120,7 +259,7 @@ export async function getProductCollection() {
       match_all: {},
     },
   };
-  const product = await esclient.search({ index: 'seller', body: query });
+  const product = await esclient.search({ index: 'buyer', body: query });
   return product;
 }
 
@@ -139,12 +278,10 @@ export async function getSelectedProduct(slug) {
 
 export async function getRelatedProducts(brand) {
   const query = {
-    query: {
-      match: {
-        'slug.keyword': brand,
-      },
-    },
     size: 8,
+    query: {
+      match: { brand_name: brand },
+    },
   };
   const product = await esclient.search({ index: 'buyer', body: query });
   return product;
@@ -257,6 +394,7 @@ export async function updateBuyerIndexProducts(slug) {
       },
     };
     const product = await esclient.search({ index: 'buyer', body: query });
+    // todo:  update buyer index, pending due to not get the logic used in forloop
     return product;
   } catch (error) {
     logger.error('error in updateBuyerIndexProducts:', error.message);
@@ -310,6 +448,282 @@ export async function removeManyProduct(filter) {
   return product;
 }
 
+export async function getProducts(body) {
+  const products = await esclient.search({ index: 'buyer', body });
+  return products;
+}
+
+export async function productFilter(body) {
+  let size = 12;
+  // const sortType = 'release_year';
+  let sortOrder = 'asc';
+  const match = {
+    inactive: false,
+    customer_ordered: false,
+    sold: false,
+    product_listed_on_dryp: true,
+  };
+  const filterCriteria = body.match;
+
+  if (body.size) {
+    size = body.size;
+  }
+  if (body.sort_by) {
+    // todo: sortType is not used in ahead code
+    // sortType = body.sort_by.type;
+    sortOrder = body.sort_by.order;
+  }
+  if (Object.hasOwn(filterCriteria, 'product_type') && filterCriteria.product_type) {
+    match.product_type = filterCriteria.product_type;
+  }
+  if (Object.hasOwn(filterCriteria, 'colors') && filterCriteria.colors) {
+    match.colors = { $in: filterCriteria.colors };
+  }
+  if (Object.hasOwn(filterCriteria, 'brands') && filterCriteria.brands) {
+    match.brand_name = { $in: filterCriteria.brands };
+  }
+  if (Object.hasOwn(filterCriteria, 'genders') && filterCriteria.genders) {
+    match.gender = { $in: filterCriteria.genders.map((gender) => gender.toLowerCase()) };
+  }
+  if (Object.hasOwn(filterCriteria, 'sizes') && filterCriteria.sizes) {
+    match.size = { $in: filterCriteria.sizes };
+  }
+  if (Object.hasOwn(filterCriteria, 'prices') && filterCriteria.prices) {
+    match.price = { $gt: filterCriteria.prices.min, $lt: filterCriteria.prices.max };
+  }
+  if (Object.hasOwn(filterCriteria, 'release_year') && filterCriteria.release_year) {
+    match.release_year = filterCriteria.release_year;
+  }
+  if (Object.hasOwn(filterCriteria, 'silhouette') && filterCriteria.silhouette) {
+    match.silhouette = { $regex: filterCriteria.silhouette, $options: 'i' };
+  }
+  if (Object.hasOwn(filterCriteria, 'search_query') && filterCriteria.search_query) {
+    match.$or = [
+      {
+        name: {
+          $regex: filterCriteria.search_query,
+          $options: 'i',
+        },
+      },
+      {
+        brand_name: {
+          $regex: filterCriteria.search_query,
+          $options: 'i',
+        },
+      },
+      {
+        silhouette: {
+          $regex: filterCriteria.search_query,
+          $options: 'i',
+        },
+      },
+    ];
+  }
+  if (Object.hasOwn(filterCriteria, 'on_sale') && filterCriteria.on_sale) {
+    match.on_sale = true;
+  }
+  const aggregate = [
+    {
+      $match: match,
+    },
+  ];
+  aggregate.push({
+    $group: {
+      slug: {
+        $first: '$slug',
+      },
+      _id: '$slug',
+      product_type: {
+        $first: '$product_type',
+      },
+      gender: {
+        $first: '$gender',
+      },
+      price: {
+        $min: '$price',
+      },
+      name: {
+        $first: '$name',
+      },
+      sku: {
+        $first: '$sku',
+      },
+      main_picture_url: {
+        $first: '$main_picture_url',
+      },
+      product_id: {
+        $first: '$product_id',
+      },
+      seller_email: {
+        $first: '$seller_email',
+      },
+      size: {
+        $first: '$size',
+      },
+      image_list: {
+        $first: '$image_list',
+      },
+      silhouette: {
+        $first: '$silhouette',
+      },
+      brand_name: {
+        $first: '$brand_name',
+      },
+      product_listed_on_dryp: {
+        $first: '$product_listed_on_dryp',
+      },
+      customer_ordered: {
+        $first: '$customer_ordered',
+      },
+      product_received_on_dryp: {
+        $first: '$product_received_on_dryp',
+      },
+      authenticity_check: {
+        $first: '$authenticity_check',
+      },
+      product_shipped_to_customer: {
+        $first: '$product_shipped_to_customer',
+      },
+      product_delivered: {
+        $first: '$product_delivered',
+      },
+      reject_product: {
+        $first: '$reject_product',
+      },
+      sold: {
+        $first: '$sold',
+      },
+      inactive: {
+        $first: '$inactive',
+      },
+      story_html: {
+        $first: '$story_html',
+      },
+      release_year: {
+        $first: '$release_year',
+      },
+      details: {
+        $first: '$details',
+      },
+      color: {
+        $first: '$color',
+      },
+      popular_rating: { $sum: 1 },
+    },
+  });
+  let value;
+  if (sortOrder === 'asc') {
+    value = 1;
+  } else {
+    value = 0;
+  }
+  aggregate.push({ $sort: { sort_type: value } });
+  try {
+    const products = await Product.aggregate(aggregate);
+    if (products.length) {
+      return { data: { total: products.length, products: products[body.from + size] } };
+    }
+    return { message: 'no data available' };
+  } catch (e) {
+    logger.error('error in productFilter:', e.message);
+  }
+}
+export async function getFilters(body) {
+  // const order = await Transaction.find(filter);
+  // return order;
+  Object.assign(body, { size: 0 });
+  const products = await esclient.search({ index: 'buyer', body });
+  return products.aggregations;
+}
+export async function getQueryResults(query) {
+  const results = {};
+  ['Sneakers', 'Streetwear'].map(async (product) => {
+    const body = {
+      query: {
+        bool: {
+          must: [
+            { term: { 'product_type.keyword': product } },
+            {
+              multi_match: {
+                query,
+                fields: ['name', 'brand_name', 'nickname', 'sku', 'silhouette', 'color'],
+                type: 'phrase_prefix',
+                operator: 'or',
+              },
+            },
+          ],
+        },
+      },
+    };
+    try {
+      const products = await esclient.search({ index: 'buyer', body });
+      results.product = products.hits.total.value;
+    } catch (e) {
+      logger.error('error in getQueryResults: ', e.message);
+      return { message: e.message };
+    }
+  });
+  return results;
+}
+
+export async function getSearch(index, queryString, size) {
+  const query = {
+    query: {
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    should: [
+                      {
+                        multi_match: {
+                          query: queryString,
+                          fields: ['name', 'brand_name', 'nickname', 'sku'],
+                          type: 'best_fields',
+                          operator: 'or',
+                          fuzziness: 0,
+                        },
+                      },
+                      {
+                        multi_match: {
+                          query: queryString,
+                          fields: ['name', 'brand_name', 'nickname', 'sku'],
+                          type: 'phrase',
+                          operator: 'or',
+                        },
+                      },
+                      {
+                        multi_match: {
+                          query: queryString,
+                          fields: ['name', 'brand_name', 'nickname', 'sku'],
+                          type: 'phrase_prefix',
+                          operator: 'or',
+                        },
+                      },
+                    ],
+                    minimum_should_match: '1',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    size,
+  };
+  try {
+    const products = await esclient.search({ index, body: query });
+    return products;
+  } catch (e) {
+    logger.error('error in getSearch: ', e.message);
+    return { error: e.message };
+  }
+
+  // return order;
+}
 export async function getOrders(filter) {
   const order = await Transaction.find(filter);
   return order;

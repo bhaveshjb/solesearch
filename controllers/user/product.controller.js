@@ -1,6 +1,10 @@
 import { productService } from 'services';
 import { catchAsync } from 'utils/catchAsync';
 import { sendEmail } from '../../services/email.service';
+import { redisClient } from '../../utils/redis';
+import { createTransaction, verifyTransaction } from '../../services/transaction.service';
+import { logger } from '../../config/logger';
+import { updateProduct } from '../../services/product.service';
 
 export const get = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -110,4 +114,41 @@ export const orders = catchAsync(async (req, res) => {
   };
   const order = await productService.getOrders(filter);
   return res.send({ orders: order });
+});
+const checkIfProductBlocked = async (productId) => {
+  const check = await redisClient.get(productId);
+  return !!check;
+};
+const blockProduct = async (productId) => {
+  await redisClient.set(productId, true, { ex: 180 });
+};
+
+export const makePayment = catchAsync(async (req, res) => {
+  const { body } = req;
+  if (!(await checkIfProductBlocked(body.product_id))) {
+    body.buyer = req.user.email;
+    await blockProduct(body.product_id);
+    const order = await createTransaction(body);
+    logger.info(`order generated: ${order.order_id}`);
+    return res.send({ message: 'Transaction order id generated.', order_id: order.order_id });
+  }
+  return res.send({ message: 'Product Blocked', blocked: true });
+});
+
+export const productSold = async (productId) => {
+  await updateProduct({ product_id: productId }, { customer_ordered: true });
+  // todo:send_email_to_seller
+  return { error: false };
+};
+
+export const verifyPayment = catchAsync(async (req, res) => {
+  const { body } = req;
+  const order = await verifyTransaction(body);
+  if (!order.error) {
+    const result = await productSold(order.product_id);
+    if (!result.error) {
+      return res.send({ message: 'Payment Verified.', error: false });
+    }
+  }
+  return res.send({ message: 'Payment not Verified.', error: true });
 });

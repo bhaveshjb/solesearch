@@ -86,6 +86,11 @@ export const getProductDetail = {
   }),
 };
 
+export const productDetailsById = {
+  params: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
+};
 export const getSelectedProduct = {
   params: Joi.object().keys({
     slug: Joi.string().required(),
@@ -103,6 +108,51 @@ export const sellProduct = {
     _id: Joi.string().required(),
     size: Joi.string().required(),
     price: Joi.number().required(),
+  }),
+};
+export const storeFrontInactive = {
+  body: Joi.object().keys({
+    product_id: Joi.string().required(),
+  }),
+};
+export const notFoundForm = {
+  body: Joi.object().keys({
+    size: Joi.string(),
+    brand_name: Joi.string().required(),
+    name: Joi.string().required(),
+    colourway: Joi.string().required(),
+  }),
+};
+
+export const makePayment = {
+  body: Joi.object().keys({
+    product_id: Joi.string().required(),
+    size: Joi.string().required(),
+    name: Joi.string().required(),
+    discount: Joi.string(),
+    slug: Joi.string().required(),
+    price: Joi.string().required(),
+    gst: Joi.string().required(),
+    email: Joi.string().required(),
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    phone_number: Joi.string().required(),
+    building_name: Joi.string(),
+    house_flat_number: Joi.string().required(),
+    street_name: Joi.string().required(),
+    landmark: Joi.string(),
+    city_village: Joi.string(),
+    state: Joi.string().required(),
+    country: Joi.string().required(),
+    zip: Joi.string().required(),
+  }),
+};
+
+export const verifyPayment = {
+  body: Joi.object().keys({
+    razorpay_payment_id: Joi.string().required(),
+    razorpay_order_id: Joi.string().required(),
+    razorpay_signature: Joi.string().required(),
   }),
 };
 export const confirmSellProduct = {
@@ -140,4 +190,38 @@ export const paginatedProduct = {
       sort: Joi.string(),
     })
     .unknown(true),
+};
+export const productsWithFilters = {
+  body: Joi.object().keys({
+    size: Joi.number(),
+    from: Joi.number(),
+    query: Joi.object(),
+    sort: Joi.object(),
+  }),
+};
+export const productFilterByQuery = {
+  body: Joi.object().keys({
+    size: Joi.number(),
+    from: Joi.number(),
+    match: Joi.object().required(),
+    sort_by: Joi.object().required(),
+  }),
+};
+export const filters = {
+  body: Joi.object().keys({
+    query: Joi.object(),
+    aggs: Joi.object(),
+  }),
+};
+export const queryResults = {
+  params: Joi.object().keys({
+    query: Joi.string().required(),
+  }),
+};
+export const search = {
+  params: Joi.object().keys({
+    index: Joi.string().required(),
+    query_string: Joi.string().required(),
+    size: Joi.number().required(),
+  }),
 };

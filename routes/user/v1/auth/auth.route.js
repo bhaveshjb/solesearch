@@ -106,5 +106,5 @@ router.post(
 /**
  *
  */
-router.patch('/set-new-password', validate(authValidation.userSetPassword), authController.userSetPassword);
+router.patch('/set-new-password', auth(), validate(authValidation.userSetPassword), authController.userSetPassword);
 module.exports = router;
