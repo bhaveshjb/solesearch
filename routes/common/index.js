@@ -58,6 +58,7 @@ router
   .patch(auth(), validate(productValidation.rejectSellProduct), productController.rejectSellProduct);
 router.route('/add-new-product').post(auth(), validate(productValidation.addNewProduct), productController.addNewProduct);
 router.route('/bulk/add-new-product').post(auth(), productController.bulkAddNewProduct);
+router.route('/bulk/add-new-users').post(auth(), productController.bulkAddNewUsers);
 
 // sell products
 router.route('/sell-product').post(auth(), validate(productValidation.sellProduct), productController.sellProduct);

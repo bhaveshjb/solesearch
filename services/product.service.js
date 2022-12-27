@@ -1,10 +1,10 @@
 import ApiError from 'utils/ApiError';
 import httpStatus from 'http-status';
 import { Bids, Product, Transaction } from 'models';
-// import csvtojson from 'csvtojson';
-// import Joi from 'joi';
 import { logger } from '../config/logger';
 import { esclient } from '../utils/elasticSearch';
+
+const elasticbulk = require('elasticbulk');
 
 async function getOriginalPrice(productPrice, isBid = false) {
   let price = Math.floor(productPrice);
@@ -100,6 +100,34 @@ export async function createProduct(body) {
     return product;
   } catch (error) {
     logger.error('error in creating Product:', error);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
+}
+export async function bulkAdd(index, data) {
+  try {
+    const products = [];
+    data.map((product) => {
+      let sku;
+      if (product.sku) {
+        sku = product.sku.toLowerCase().replace(' ', '-');
+      } else {
+        sku = '';
+      }
+      const addData = {
+        gender: product.gender,
+        slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
+        main_picture_url: 'display_picture.png',
+      };
+      products.push(Object.assign(product, addData));
+      return products;
+    });
+
+    await elasticbulk.import(products, {
+      index,
+      host: 'http://localhost:9200',
+    });
+  } catch (error) {
+    logger.error('error in bulkAdd Product:', error.message);
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }

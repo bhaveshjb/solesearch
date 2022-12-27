@@ -1,6 +1,7 @@
 import { productService } from 'services';
 import { catchAsync } from 'utils/catchAsync';
 // import csvtojson from 'csvtojson';
+import httpStatus from 'http-status';
 import { getTrendingBids } from '../../services/bids.service';
 import { Product } from '../../models';
 import { createTransaction, getRecentlySoldOrders, verifyTransaction } from '../../services/transaction.service';
@@ -8,7 +9,9 @@ import { redisClient } from '../../utils/redis';
 import { logger } from '../../config/logger';
 import { updateProduct } from '../../services/product.service';
 import { sendEmail } from '../../services/email.service';
+import ApiError from '../../utils/ApiError';
 
+const csv = require('csvtojson');
 const utf8 = require('utf8');
 
 export const check = catchAsync(async (req, res) => {
@@ -81,7 +84,6 @@ export const panelAddProduct = catchAsync(async (req, res) => {
   await productService.updateBuyerIndexProducts(oldSlug, body);
   // todo: update images to cloudinary
   body.product_id = utf8.encode(`${body.name} ${Date.now()}`); //
-  console.log('body.product_id=> ', body.product_id);
   await productService.updateSellerAlgolia(body);
   return res.send({ results: 'done' });
 });
@@ -103,60 +105,52 @@ export const addNewProduct = catchAsync(async (req, res) => {
   return res.send({ message: 'Product added successfully', error: false });
 });
 export const bulkAddNewProduct = catchAsync(async (req, res) => {
-  console.log('req.files=> ', Object.keys(req));
-  // const file = req.files;
-  console.log('req.files=xx  > ', req.files.file.data.toString());
-  // console.log('buffer data ===> ', (req.files.avatar.data).toJSON());
   const rawData = req.files.file.data.toString();
-  // todo: read the data of csv file and get result in the Array
-  // const file = [['name', 'description', 'product_type', 'gender', 'brand_name', 'color']];
-
-  // const rows = rawData.split('\n');
-  // const titleRowArray = rows.shift().split(',');
-  const arrayofArrays = convertCSVToArray(rawData, {
-    type: 'array',
-    separator: ',', // use the separator you use in your csv (e.g. '\t', ',', ';' ...)
+  const productData = await csv({
+    noheader: true,
+    headers: ['name', 'description', 'product_type', 'gender', 'brand_name', 'color'],
+    output: 'csv',
+  }).fromString(rawData);
+  const requiredHeaders = ['name', 'description', 'product_type', 'gender', 'brand_name', 'color'];
+  const fileHeaders = productData[0].map((v) => v.toLowerCase());
+  const checkHeader = [];
+  fileHeaders.map((ele) => {
+    const result = requiredHeaders.includes(ele);
+    checkHeader.push(result);
+    return checkHeader;
   });
-  // const housingDataArray = [];
-  // rows.forEach((housingEntry, index) => {
-  //   const housingObject = {};
-  //   // creat array from CSV entry string
-  //   const housingEntryArray = housingEntry.split(',');
-  //   // loop over every element in the housingEntryArray to build the housingObject
-  //   housingEntryArray.forEach((e, i) => {
-  //     // set each value with its corresponding title in the housing object
-  //     housingObject[titleRowArray[i]] = e;
-  //   });
-  //   // append hosingObject to the housingDataArray
-  //   housingDataArray.push(housingObject);
-  // });
+  if (checkHeader.includes(false)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Csv file headers are incorrect');
+  }
+  const results = [];
+  productData.map((arr) => {
+    const obj = {
+      name: arr[0],
+      story_html: arr[1],
+      product_type: arr[2],
+      gender: arr[3],
+      brand_name: arr[4],
+      color: arr[5],
+    };
+    results.push(obj);
+    return results;
+  });
+  await productService.bulkAdd('seller', results);
+  return res.send({ error: false, message: 'Products added successfully.' });
+});
 
-  console.log('titleRowArray=> ', arrayofArrays);
-  const headers = [
-    'name',
-    'description',
-    'product_type',
-    'gender',
-    'release_year',
-    'colourway',
-    'sku',
-    'nickname',
-    'brand_name',
-    'silhouette',
-    'color',
-  ];
-  // const requiredHeaders = ['NAME', 'Description', 'product_type', 'gender', 'brand_name', 'color'];
-  // const fileHeaders = file[0].map((v) => v.toLowerCase());
-  // const checkHeader = [];
-  // fileHeaders.map((ele) => {
-  //   const result = requiredHeaders.includes(ele);
-  //   checkHeader.push(result);
-  // });
-  // console.log('checkHeader ', checkHeader);
-  // if (checkHeader.includes(false)) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Csv file headers are incorrect');
-  // }
-  return res.send({ result: ' ', error: false });
+export const bulkAddNewUsers = catchAsync(async (req, res) => {
+  try {
+    const rawData = req.files.file.data.toString();
+    const userData = await csv({
+      noheader: false,
+      output: 'csv',
+    }).fromString(rawData);
+    logger.info(`userData : ${userData}`);
+    return res.send({ result: '', error: false });
+  } catch (e) {
+    throw new ApiError(httpStatus.BAD_REQUEST, ` error from bulk add users : ${e.message}`);
+  }
 });
 
 export const selectedProduct = catchAsync(async (req, res) => {
