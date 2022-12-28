@@ -16,8 +16,20 @@ import { errorConverter, errorHandler } from 'middlewares/error';
 import sendResponse from 'middlewares/sendResponse';
 import config from 'config/config';
 import { successHandler, errorHandler as morganErrorHandler } from 'config/morgan';
+import { Bids, Flakers, Product, Subscription, Transaction, User, VerifiedSellers } from 'models';
+
 // import ejs from 'ejs';
 //  const upload = require('multer')({ dest: '/tmp' });
+const session = require('express-session');
+const AdminBro = require('admin-bro');
+const mongooseAdminBro = require('@admin-bro/mongoose');
+const expressAdminBro = require('@admin-bro/express');
+
+AdminBro.registerAdapter(mongooseAdminBro);
+const AdminBroOptions = {
+  resources: [User, Product, Transaction, Subscription, Bids, Flakers, VerifiedSellers],
+  rootPath: '/admin-panel/admin',
+};
 
 mongoosePaginate.paginate.options = {
   customLabels: { docs: 'results', totalDocs: 'totalResults' },
@@ -53,6 +65,18 @@ passport.use('jwt', jwtStrategy);
 // app.set('view engine', 'ejs');
 // app.engine('html', ejs.renderFile);
 // v1 admin-panel routes
+
+app.use(
+  session({
+    secret: 'mysecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
+const adminBro = new AdminBro(AdminBroOptions);
+const adminBroRoute = expressAdminBro.buildRouter(adminBro);
+app.use(adminBro.options.rootPath, adminBroRoute);
 app.use('/admin-panel', routes);
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

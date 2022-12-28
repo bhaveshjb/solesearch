@@ -1,0 +1,26 @@
+<html>
+<body>
+<form method="POST" action="">
+  <% if (form.hidden_tag) { %>
+    <%- form.hidden_tag() %>
+  <% } %>
+  <% for (const f of form) {
+  if (f.type !== 'CSRFTokenField') { %>
+    <div style="margin-top: 14px">
+      <%- f.label %> <%- f %>
+      <% if (f.errors) { %>
+        <ul>
+          <% for (const e of f.errors) { %>
+            <li><%- e %></li>
+          <% } %>
+        </ul>
+      <% } %>
+    </div>
+  <% } %>
+  <% } %>
+  <div style="margin-top: 14px">
+    <input type="submit" />
+  </div>
+</form>
+</body>
+</html>
