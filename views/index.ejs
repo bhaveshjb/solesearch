@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <body>
+    <div>
+    <% if(user){ %>
+       Hello !
+      <a href="/admin-panel/logout">Logout</a>
+      <% }else{%>
+        Welcome anonymous user!
+      <a href="/admin-panel/login">Login</a>
+    <% }%>
+    </div>
+    <div>
+      <a href="{{ url_for('admin.index') }}">Go to admin!</a>
+    </div>
+  </body>
