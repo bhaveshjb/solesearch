@@ -6,8 +6,8 @@ import { productController } from '../../../controllers/admin';
 
 const router = express.Router();
 router.route('/id/:id').get(auth(), validate(productValidation.productDetailsById), productController.productDetailsById);
-router.route('/trending').get(auth(), productController.getTrendingProducts);
-router.route('/recently-sold').get(auth(), productController.getRecentlySoldProducts);
-router.route('/on-sale').get(auth(), productController.getOnSaleProducts);
-router.route('/:slug').get(auth(), validate(productValidation.getProductDetail), productController.productDetail);
+router.route('/trending').get(productController.getTrendingProducts);
+router.route('/recently-sold').get(productController.getRecentlySoldProducts);
+router.route('/on-sale').get(productController.getOnSaleProducts);
+router.route('/:slug').get(validate(productValidation.getProductDetail), productController.productDetail);
 module.exports = router;

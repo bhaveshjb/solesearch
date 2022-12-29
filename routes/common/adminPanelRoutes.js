@@ -20,7 +20,7 @@ router.route('/login').post(validate(authValidation.login), async (req, res) => 
       const validatePassword = await bcrypt.compare(req.body.password, user.password);
       if (validatePassword) {
         loggedIn = true;
-        res.redirect('admin');
+        res.redirect('../admin');
       }
       res.send('Invalid username or password');
     }
@@ -35,7 +35,6 @@ router.get('/login', (req, res) => {
 
 router.get('/logout', (req, res) => {
   loggedIn = false;
-  res.render('index.ejs', { user: loggedIn });
+  res.redirect('../admin/logout');
 });
-
 module.exports = router;
