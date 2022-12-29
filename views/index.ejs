@@ -1,12 +1,12 @@
 <html>
   <body>
     <div>
-    <% if(user && user.is_authenticated){ %>
-       Hello  <%= user.login %>!
-      <a href="{{ url_for('logout_view') }}">Logout</a>
+    <% if(user){ %>
+       Hello !
+      <a href="/admin-panel/logout">Logout</a>
       <% }else{%>
         Welcome anonymous user!
-      <a href="/admin-panel/login-page">Login</a>
+      <a href="/admin-panel/login">Login</a>
     <% }%>
     </div>
     <div>

@@ -20,7 +20,6 @@ import { Bids, Flakers, Product, Subscription, Transaction, User, VerifiedSeller
 
 // import ejs from 'ejs';
 //  const upload = require('multer')({ dest: '/tmp' });
-const session = require('express-session');
 const AdminBro = require('admin-bro');
 const mongooseAdminBro = require('@admin-bro/mongoose');
 const expressAdminBro = require('@admin-bro/express');
@@ -61,22 +60,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 // jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
-// app.set('views', path.join(__dirname, 'views/'));
-// app.set('view engine', 'ejs');
-// app.engine('html', ejs.renderFile);
-// v1 admin-panel routes
 
-app.use(
-  session({
-    secret: 'mysecret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true },
-  })
-);
 const adminBro = new AdminBro(AdminBroOptions);
 const adminBroRoute = expressAdminBro.buildRouter(adminBro);
 app.use(adminBro.options.rootPath, adminBroRoute);
+
 app.use('/admin-panel', routes);
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
