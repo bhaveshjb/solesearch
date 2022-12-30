@@ -6,7 +6,9 @@ import { authValidation, subscriptionValidation, userValidation } from '../../va
 import { authController, subscriptionController, userController } from '../../controllers/user';
 import { productValidation } from '../../validations/admin';
 
-// const upload = require('multer')({ dest: '/tmp' });
+const multer = require('multer');
+
+const upload = multer({ dest: 'temp_images/' });
 const productRoute = require('./product/product.route');
 
 const router = express.Router();
@@ -25,38 +27,37 @@ router
   .get(auth(), userController.wishList);
 
 // Elastic search GET APIs from vue frontend
-router.route('/collection').get(auth(), productController.collection);
-router.route('/search/:index/:query_string/:size').get(auth(), validate(productValidation.search), productController.search);
+router.route('/collection').get(productController.collection);
+router.route('/search/:index/:query_string/:size').get(validate(productValidation.search), productController.search);
 router
   .route('/selected-product/:slug')
-  .get(auth(), validate(productValidation.getSelectedProduct), productController.selectedProduct);
+  .get(validate(productValidation.getSelectedProduct), productController.selectedProduct);
 router
   .route('/related-products/:brand')
-  .get(auth(), validate(productValidation.getRelatedProducts), productController.relatedProducts);
+  .get(validate(productValidation.getRelatedProducts), productController.relatedProducts);
 router
   .route('/products/filters')
-  .post(auth(), validate(productValidation.productsWithFilters), productController.productsWithFilters);
+  .post(validate(productValidation.productsWithFilters), productController.productsWithFilters);
 router
   .route('/products/filters/new')
-  .post(auth(), validate(productValidation.productFilterByQuery), productController.productFilterByQuery);
-router.route('/filters').post(auth(), validate(productValidation.filters), productController.filters);
-router.route('/query-results/:query').get(auth(), validate(productValidation.queryResults), productController.queryResults);
+  .post(validate(productValidation.productFilterByQuery), productController.productFilterByQuery);
+router.route('/filters').post(validate(productValidation.filters), productController.filters);
+router.route('/query-results/:query').get(validate(productValidation.queryResults), productController.queryResults);
 
 // Dashboard APIs
 router
   .route('/panel-add-product')
-  .post(auth(), validate(productValidation.panelAddProduct), productController.panelAddProduct);
+  .post(upload.array('image', 5), validate(productValidation.panelAddProduct), productController.panelAddProduct);
 router
   .route('/panel-delete-product')
-  .post(auth(), validate(productValidation.panelDeleteProduct), productController.panelDeleteProduct);
-router.route('/product-review').get(auth(), productController.productReview);
+  .post(validate(productValidation.panelDeleteProduct), productController.panelDeleteProduct);
+router.route('/product-review').get(productController.productReview);
+router.route('/confirm-review').patch(validate(productValidation.confirmSellProduct), productController.confirmSellProduct);
+router.route('/reject-review').patch(validate(productValidation.rejectSellProduct), productController.rejectSellProduct);
 router
-  .route('/confirm-review')
-  .patch(auth(), validate(productValidation.confirmSellProduct), productController.confirmSellProduct);
-router
-  .route('/reject-review')
-  .patch(auth(), validate(productValidation.rejectSellProduct), productController.rejectSellProduct);
-router.route('/add-new-product').post(auth(), validate(productValidation.addNewProduct), productController.addNewProduct);
+  .route('/add-new-product')
+  .post(upload.array('image', 5), validate(productValidation.addNewProduct), productController.addNewProduct);
+
 router.route('/bulk/add-new-product').post(auth(), productController.bulkAddNewProduct);
 router.route('/bulk/add-new-users').post(auth(), productController.bulkAddNewUsers);
 
@@ -69,7 +70,7 @@ router
   .delete(auth(), validate(productValidation.storeFrontInactive), productController.storeFrontInactive);
 router.route('/sold-product').get(auth(), productController.soldProduct);
 router.route('/not-found-form').post(auth(), validate(productValidation.notFoundForm), productController.notFoundForm);
-router.route('/Orders').get(auth('user'), productController.orders);
+router.route('/Orders').get(auth(), productController.orders);
 
 // Buy Product
 router.route('/buy-product').post(auth(), validate(productValidation.makePayment), productController.makePayment);
