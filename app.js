@@ -7,7 +7,7 @@ import compression from 'compression';
 import cors from 'cors';
 import httpStatus from 'http-status';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import fileUpload from 'express-fileupload';
+// import fileUpload from 'express-fileupload';
 import passport from 'passport';
 import jwtStrategy from 'config/passport';
 import routes from 'routes';
@@ -38,7 +38,7 @@ app.use(helmet());
 app.use(adminBro.options.rootPath, adminBroRoute);
 // app.use(bodyParser.json());
 app.use(express.json());
-app.use(fileUpload());
+// app.use(fileUpload());
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 // sanitize request data

@@ -2,6 +2,8 @@ import { productService } from 'services';
 import { catchAsync } from 'utils/catchAsync';
 // import csvtojson from 'csvtojson';
 import httpStatus from 'http-status';
+import fs from 'fs';
+import _ from 'lodash';
 import { getTrendingBids } from '../../services/bids.service';
 import { Product } from '../../models';
 import { createTransaction, getRecentlySoldOrders, verifyTransaction } from '../../services/transaction.service';
@@ -10,6 +12,8 @@ import { logger } from '../../config/logger';
 import { updateProduct } from '../../services/product.service';
 import { sendEmail } from '../../services/email.service';
 import ApiError from '../../utils/ApiError';
+import uploadToCloudinary from '../../utils/cloudinary';
+import generateProductId from '../../utils/generateProductId';
 
 const csv = require('csvtojson');
 
@@ -35,13 +39,13 @@ export const get = catchAsync(async (req, res) => {
 export const productDetail = catchAsync(async (req, res) => {
   const { slug } = req.params;
   const product = await productService.getProductDetails(slug);
-  return res.send({ results: product });
+  return res.send(product);
 });
 
 export const productDetailsById = catchAsync(async (req, res) => {
   const { id } = req.params;
   const product = await productService.getProductDetailsById(id);
-  return res.send({ product });
+  return res.send({ product, error: false });
 });
 
 export const list = catchAsync(async (req, res) => {
@@ -53,7 +57,7 @@ export const list = catchAsync(async (req, res) => {
 
 export const collection = catchAsync(async (req, res) => {
   const product = await productService.getProductCollection();
-  return res.send({ results: product });
+  return res.send({ products: product, error: false });
 });
 
 export const paginate = catchAsync(async (req, res) => {
@@ -73,7 +77,7 @@ function titleCase(st) {
 }
 
 export const panelAddProduct = catchAsync(async (req, res) => {
-  const { body } = req;
+  let { body } = req;
   const oldSlug = body.slug;
   const slug = body.name.toLowerCase().replace(' ', '-');
   const sku = body.sku.toLowerCase().replace(' ', '-');
@@ -81,11 +85,52 @@ export const panelAddProduct = catchAsync(async (req, res) => {
   body.brand_name = titleCase(body.brand_name);
 
   await productService.updateBuyerIndexProducts(oldSlug, body);
-  // todo: update images to cloudinary
-  body.product_id = encodeURIComponent(`${body.name}${Date.now()}`); //
+  const imageFiles = req.files;
+  const imageList = [];
+  let displayPicture;
+
+  if (!imageList.length) {
+    _.omit(body, body.image_list);
+  }
+  if (imageFiles) {
+    if (imageFiles.length) {
+      for (let i = 0; i < imageFiles.length; i += 1) {
+        const fileContentType = imageFiles[i].mimetype.split('/');
+        const fileType = fileContentType[1];
+        // assign the name of the file based on its position in the list
+        let name;
+        if (i === 0) {
+          name = `display_picture.${fileType}`;
+          displayPicture = name;
+        } else {
+          name = `${i}.${fileType}`;
+          imageList.push(name);
+        }
+        // save the file to the "temp_images" folder
+        fs.rename(`${imageFiles[i].path}`, `temp_images/${name}`, function (err) {
+          if (err) {
+            logger.error(`error in file renaming: ${err}`);
+          } else {
+            // file renamed successfully
+            logger.info('successfully file renamed');
+          }
+        });
+      }
+      body = await uploadToCloudinary(displayPicture, imageList, body);
+      if (!body.error) {
+        body = body.data;
+        body.product_id = generateProductId(body);
+        await productService.updateSellerAlgolia(body);
+        return res.send({ message: 'Product updated successfully', error: false });
+      }
+      res.send({ message: 'error in uploading images', error: true });
+    }
+  }
+  body.product_id = generateProductId(body);
   await productService.updateSellerAlgolia(body);
-  return res.send({ results: 'done' });
+  return res.send({ message: 'Product updated successfully', error: false });
 });
+
 export const panelDeleteProduct = catchAsync(async (req, res) => {
   const { body } = req;
   await productService.deleteProductDetails(body);
@@ -94,10 +139,39 @@ export const panelDeleteProduct = catchAsync(async (req, res) => {
 
 export const addNewProduct = catchAsync(async (req, res) => {
   const { body } = req;
+
   const slug = body.name.toLowerCase().replace(' ', '-');
   const sku = body.sku.toLowerCase().replace(' ', '-');
   body.slug = `${slug}-${sku}`;
   body.brand_name = titleCase(body.brand_name);
+  const imageFiles = req.files;
+  const imageList = [];
+  let displayPicture = '';
+  if (imageFiles.length) {
+    for (let i = 0; i < imageFiles.length; i += 1) {
+      const fileContentType = imageFiles[i].mimetype.split('/');
+      const fileType = fileContentType[1];
+      // assign the name of the file based on its position in the list
+      let name;
+      if (i === 0) {
+        name = `display_picture.${fileType}`;
+        displayPicture = name;
+      } else {
+        name = `${i}.${fileType}`;
+        imageList.push(name);
+      }
+      // save the file to the "temp_images" folder
+      fs.rename(`${imageFiles[i].path}`, `temp_images/${name}`, function (err) {
+        if (err) {
+          logger.error(`error in file renaming: ${err}`);
+        } else {
+          // file renamed successfully
+          logger.info('successfully file renamed');
+        }
+      });
+    }
+    await uploadToCloudinary(displayPicture, imageList, body);
+  }
 
   // add method  upload_to_cloudinary to add upload images in cloudinary
   await productService.createProduct(body);
@@ -193,13 +267,13 @@ export const bulkAddNewUsers = catchAsync(async (req, res) => {
 export const selectedProduct = catchAsync(async (req, res) => {
   const { slug } = req.params;
   const product = await productService.getSelectedProduct(slug);
-  return res.send({ product });
+  return res.send({ product, error: false });
 });
 
 export const relatedProducts = catchAsync(async (req, res) => {
   const { brand } = req.params;
-  const product = await productService.getRelatedProducts(brand);
-  return res.send({ results: product });
+  const products = await productService.getRelatedProducts(brand);
+  return res.send({ products, error: false });
 });
 
 export const sellProduct = catchAsync(async (req, res) => {
@@ -428,5 +502,5 @@ export const search = catchAsync(async (req, res) => {
   const { index, size } = req.params;
   const queryString = req.params.query_string;
   const products = await productService.getSearch(index, queryString, size);
-  return res.send({ products });
+  return res.send({ products, error: false });
 });
