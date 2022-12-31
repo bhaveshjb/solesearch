@@ -3,6 +3,8 @@ import httpStatus from 'http-status';
 import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
 import { esclient } from '../utils/elasticSearch';
+import generateProductId from '../utils/generateProductId';
+// import { sendEmail } from './email.service';
 
 const elasticbulk = require('elasticbulk');
 
@@ -85,7 +87,7 @@ export async function updateProduct(filter, body, options) {
     const product = Product.findOneAndUpdate(filter, body, options);
     return product;
   } catch (error) {
-    logger.error('error in creating Product:', error);
+    logger.error('error in updating Product:', error);
     if (error.name === 'MongoError' && error.code === 11000) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You are trying to create duplicate entry!');
     } else {
@@ -147,7 +149,7 @@ export async function bulkSell(sellerEmail, data) {
       product.gender = gender;
       product.price = 1000;
       product.size = '8';
-      const encodedProductId = encodeURIComponent(`${product.name}${Date.now()}`);
+      const encodedProductId = generateProductId(data);
       const validatedProduct = {
         slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
         product_id: encodedProductId,
@@ -192,9 +194,27 @@ export async function deleteProductDetails(productDetails) {
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }
+async function leasePrice(size, price, productIds) {
+  const result = {};
+
+  size.forEach((currentSize, index) => {
+    if (!result[currentSize]) {
+      result[currentSize] = {
+        price: price[index],
+        productId: productIds[index],
+      };
+    } else if (price[index] < result[currentSize].price) {
+      result[currentSize] = {
+        price: price[index],
+        productId: productIds[index],
+      };
+    }
+  });
+  return result;
+}
 
 export async function getProductDetails(slug) {
-  const aggregate = [
+  const aggregateQuery = [
     {
       $match: {
         slug,
@@ -213,13 +233,16 @@ export async function getProductDetails(slug) {
       },
     },
   ];
-  const productSizesPrice = await Product.aggregate(aggregate);
-  // if (productSizesPrice) {
-  //   const { sizes } = productSizesPrice[0].sizes;
-  //   const { prices } = productSizesPrice[0].prices;
-  //   const { product_ids } = productSizesPrice[0].product_ids;
-  // }
-  // todo: add least_price function
+  const productSizesPrice = await Product.aggregate(aggregateQuery);
+  let sizePrice;
+  if (productSizesPrice.length) {
+    const sizes = productSizesPrice[0].size;
+    const prices = productSizesPrice[0].price;
+    const productIds = productSizesPrice[0].product_ids;
+    sizePrice = leasePrice(sizes, prices, productIds);
+  } else {
+    sizePrice = [];
+  }
   const query = {
     query: {
       match: {
@@ -227,8 +250,8 @@ export async function getProductDetails(slug) {
       },
     },
   };
-  console.log('productSizesPrice=> ', productSizesPrice);
-  const product = await esclient.search({ index: 'seller', body: query });
+  const productDetailsBySlug = await esclient.search({ index: 'seller', body: query });
+  const productAttributes = productDetailsBySlug.hits.hits[0]._source || [];
   const soldPrice = await Product.aggregate([
     { $match: { slug, customer_ordered: true } },
     {
@@ -240,9 +263,23 @@ export async function getProductDetails(slug) {
       },
     },
   ]);
+  let lowestSoldPrice;
 
-  console.log('soldPrice=> ', soldPrice);
-  return product.hits.hits[0]._source;
+  if (soldPrice) {
+    lowestSoldPrice = soldPrice.reduce((acc, product) => {
+      acc[product._id.size] = product.price;
+      return acc;
+    }, 0);
+  } else {
+    lowestSoldPrice = 0;
+  }
+
+  return {
+    product_size_price: sizePrice,
+    product_attributes: productAttributes,
+    lowest_sold_price: lowestSoldPrice,
+    error: false,
+  };
 }
 export async function getProductDetailsById(productId) {
   const product = await getOne({ product_id: productId });
@@ -301,7 +338,7 @@ export async function getProductDetail(productData) {
 }
 export async function sellProductService(productData, userData) {
   const productDetail = await getProductDetail(productData);
-
+  productDetail.product_id = generateProductId(productData);
   productDetail.seller_email = userData.email;
   productDetail.size = productData.size;
   productDetail.product_listed_on_dryp = false;
@@ -313,9 +350,8 @@ export async function sellProductService(productData, userData) {
   productDetail.reject_product = false;
   productDetail.sold = false;
   productDetail.inactive = false;
-
   await Product.create(productDetail);
-  return { message: 'Product added for review' };
+  return 'Product added for review';
 }
 export async function getStoreFront(filter) {
   const options = {};
@@ -369,10 +405,19 @@ export async function sellConfirmation(id) {
   const filter = {
     _id: id,
   };
-  const product = await Product.findOneAndUpdate(filter, { product_listed_on_dryp: true }).lean();
-  // TODO: send email
+  await Product.findOneAndUpdate(filter, { product_listed_on_dryp: true }).lean();
+  const product = await Product.findOne(filter);
+
+  //   // TODO: send email
+  //   const subject = `Product Accepted ${product.name}`;
+  //   const text = `Your product is now listed on SoleSearch.
+  // Product: ${product.name}
+  // Size: ${product.size}
+  // Price: ${product.price}`;
+  //   const to = product.seller_email;
+  //   await sendEmail({ to, subject, text, isHtml: false });
   await getAlgolia(product);
-  return product;
+  return 'product added';
 }
 export async function sellDecline(id) {
   const filter = {
@@ -381,21 +426,45 @@ export async function sellDecline(id) {
   const product = await updateProduct(filter, { reject_product: true }, { new: true });
   // const product = await Product.findOneAndUpdate(filter, { reject_product: true });
   // TODO: send email
+  //   const subject = `Product Rejected ${product.name}`;
+  //   const text = `Your product has been rejected.
+  // Product: ${product.name}
+  // Size: ${product.size}
+  // Price: ${product.price}
+  //
+  // If you think this could be an error, please reply to this email and we will reach out to you.`;
   return product;
 }
-export async function updateBuyerIndexProducts(slug) {
+export async function updateBuyerIndexProducts(slug, args) {
   try {
     const query = {
       size: 1000,
       query: {
-        match: {
-          'slug.keyword': slug,
-        },
+        match: { 'slug.keyword': slug },
       },
     };
-    const product = await esclient.search({ index: 'buyer', body: query });
-    // todo:  update buyer index, pending due to not get the logic used in forloop
-    return product;
+    const products = await esclient.search({
+      index: 'buyer',
+      body: query,
+    });
+    const keysToAvoid = ['_id', 'image_list', 'story_html'];
+    const updatedAttributes = Object.keys(args).reduce((acc, key) => {
+      if (!keysToAvoid.includes(key)) {
+        acc[key] = args[key];
+      }
+      return acc;
+    }, {});
+
+    products.hits.hits.forEach((product) => {
+      const updatedSource = { ...product._source, ...updatedAttributes };
+      esclient.update({
+        index: 'buyer',
+        id: product._id,
+        body: {
+          doc: updatedSource,
+        },
+      });
+    });
   } catch (error) {
     logger.error('error in updateBuyerIndexProducts:', error.message);
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
@@ -409,7 +478,7 @@ export async function updateSellerAlgolia(productDetails) {
     await esclient.update({ index: 'seller', id: objectID, body: { doc: productDetail } });
     return { message: 'successfully seller algolia updated' };
   } catch (error) {
-    logger.error('error in updateBuyerIndexProducts:', error.message);
+    logger.error('error in updateSellerAlgolia:', error.message);
     throw new ApiError(httpStatus.BAD_REQUEST, error.message);
   }
 }
@@ -448,7 +517,13 @@ export async function removeManyProduct(filter) {
   return product;
 }
 
-export async function getProducts(body) {
+export async function getProducts(args) {
+  const body = {
+    size: args.size,
+    from: args.from,
+    query: args.query,
+    sort: args.sort || [],
+  };
   const products = await esclient.search({ index: 'buyer', body });
   return products;
 }
