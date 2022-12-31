@@ -1,4 +1,5 @@
 import express from 'express';
+import passport from 'passport';
 import auth from '../../middlewares/auth';
 import validate from '../../middlewares/validate';
 import { productController } from '../../controllers/admin';
@@ -21,6 +22,12 @@ router.post('/login', validate(authValidation.login), authController.login);
 router.patch('/set-new-password', auth(), validate(authValidation.userSetPassword), authController.userSetPassword);
 router.patch('/verifyUser', auth(), authController.verifyUser);
 router.post('/logout', auth(), validate(authValidation.logout), authController.logout);
+router.post(
+  '/facebook-signup-login',
+  validate(authValidation.faceBookLogin),
+  passport.authenticate('facebook-token', { session: false }),
+  authController.socialLogin
+);
 router
   .route('/wish-list')
   .patch(auth(), validate(userValidation.wishList), userController.updateWishList)
@@ -44,7 +51,8 @@ router
 router.route('/filters').post(validate(productValidation.filters), productController.filters);
 router.route('/query-results/:query').get(validate(productValidation.queryResults), productController.queryResults);
 
-// Dashboard APIs
+
+
 router
   .route('/panel-add-product')
   .post(upload.array('image', 5), validate(productValidation.panelAddProduct), productController.panelAddProduct);
@@ -54,10 +62,11 @@ router
 router.route('/product-review').get(productController.productReview);
 router.route('/confirm-review').patch(validate(productValidation.confirmSellProduct), productController.confirmSellProduct);
 router.route('/reject-review').patch(validate(productValidation.rejectSellProduct), productController.rejectSellProduct);
+
 router
   .route('/add-new-product')
   .post(upload.array('image', 5), validate(productValidation.addNewProduct), productController.addNewProduct);
-
+  
 router.route('/bulk/add-new-product').post(auth(), productController.bulkAddNewProduct);
 router.route('/bulk/add-new-users').post(auth(), productController.bulkAddNewUsers);
 
