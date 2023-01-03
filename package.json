@@ -10,8 +10,9 @@
   },
   "scripts": {
     "start": "pm2 start ecosystem.config.js --env development",
+    "start-prod": "npm run build && pm2 start ecosystem.config.js --env production",
     "dev-es6": " NODE_ENV=development nodemon --inspect index.js --exec babel-node -e js",
-    "build": "babel index.js --out-dir build",
+    "build": "babel . --ignore node_modules --source-type module --out-dir build && cp .env build/ ",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check **/*.js",
