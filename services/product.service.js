@@ -43,26 +43,6 @@ export async function getObjectByProductId(productId) {
   return { found: true };
 }
 
-export async function productUpdate() {
-  const slugs = [
-    "nike-dunk-low-'varsity-royal'-cu1726100",
-    "air-jordan-1-high-og-'lost-and-found'-dz5485612",
-    "travis-scott-x-air-jordan-1-low-og-'reverse-mocha'-dm7866162",
-    'fragment-design-x-travis-scott-x-air-jordan-1-retro-low-dm7866140',
-    "union-la-x-air-jordan-1-retro-high-nrg-'black-toe'-bv1300106",
-    "air-jordan-1-mid-se-'black-and-white'-dh6933100",
-    "dunk-low-'pure-platinum'-dj6188001",
-    'nike-air-force-1-mid-x-off-white-black-do6290-001',
-    "nike-sb-dunk-low-'why-so-sad'-dx5549400",
-    "union-la-x-dunk-low-'passport-pack---argon'-dj9649400",
-    "yeezy-foam-runner-'onyx'-hp8739",
-  ];
-  slugs.map(async (slug) => {
-    await Product.updateMany({ slug }, { on_sale: true });
-  });
-  return 'Done';
-}
-
 export async function getProductById(id, options) {
   const product = await Product.findById(id, options);
   return product;
@@ -96,6 +76,30 @@ export async function updateProduct(filter, body, options) {
   }
 }
 
+export async function productUpdate() {
+  const slugs = [
+    "nike-dunk-low-'varsity-royal'-cu1726100",
+    "air-jordan-1-high-og-'lost-and-found'-dz5485612",
+    "travis-scott-x-air-jordan-1-low-og-'reverse-mocha'-dm7866162",
+    'fragment-design-x-travis-scott-x-air-jordan-1-retro-low-dm7866140',
+    "union-la-x-air-jordan-1-retro-high-nrg-'black-toe'-bv1300106",
+    "air-jordan-1-mid-se-'black-and-white'-dh6933100",
+    "dunk-low-'pure-platinum'-dj6188001",
+    'nike-air-force-1-mid-x-off-white-black-do6290-001',
+    "nike-sb-dunk-low-'why-so-sad'-dx5549400",
+    "union-la-x-dunk-low-'passport-pack---argon'-dj9649400",
+    "yeezy-foam-runner-'onyx'-hp8739",
+  ];
+  slugs.map(async (slug) => {
+    const products = await updateProduct({ slug }, { on_sale: true });
+    return products;
+  });
+  return 'Done';
+}
+export async function sneakerList(offset) {
+  const productList = await Product.find({}).skip(offset).limit(20);
+  return productList;
+}
 export async function createProduct(body) {
   try {
     const product = await esclient.index({ index: 'seller', body });

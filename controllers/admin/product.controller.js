@@ -19,11 +19,11 @@ const csv = require('csvtojson');
 
 export const check = catchAsync(async (req, res) => {
   const status = await productService.productUpdate();
-  return res.send({ message: status });
+  return res.send({ message: status, error: false, data: {} });
 });
 export const sneakersList = catchAsync(async (req, res) => {
-  const filter = {};
-  const status = await productService.getProductList(filter);
+  const { offset } = req.body;
+  const status = await productService.sneakerList(offset);
   return res.send({ message: status });
 });
 
@@ -333,7 +333,7 @@ export const orders = catchAsync(async (req, res) => {
     is_bid: false,
   };
   const order = await productService.getOrders(filter);
-  return res.send({ orders: order });
+  return res.send({ orders: order, error: false });
 });
 const checkIfProductBlocked = async (productId) => {
   const checkProduct = await redisClient.get(productId);
