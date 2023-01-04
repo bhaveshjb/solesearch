@@ -7,7 +7,9 @@ import { authValidation, subscriptionValidation, userValidation } from '../../va
 import { authController, subscriptionController, userController } from '../../controllers/user';
 import { productValidation } from '../../validations/admin';
 
-// const upload = require('multer')({ dest: '/tmp' });
+const multer = require('multer');
+
+const upload = multer({ dest: 'temp_images/' });
 const productRoute = require('./product/product.route');
 
 const router = express.Router();
@@ -49,15 +51,22 @@ router
 router.route('/filters').post(validate(productValidation.filters), productController.filters);
 router.route('/query-results/:query').get(validate(productValidation.queryResults), productController.queryResults);
 
-// Dashboard APIs
-router.route('/panel-add-product').post(validate(productValidation.panelAddProduct), productController.panelAddProduct);
+
+
+router
+  .route('/panel-add-product')
+  .post(upload.array('image', 5), validate(productValidation.panelAddProduct), productController.panelAddProduct);
 router
   .route('/panel-delete-product')
   .post(validate(productValidation.panelDeleteProduct), productController.panelDeleteProduct);
 router.route('/product-review').get(productController.productReview);
 router.route('/confirm-review').patch(validate(productValidation.confirmSellProduct), productController.confirmSellProduct);
 router.route('/reject-review').patch(validate(productValidation.rejectSellProduct), productController.rejectSellProduct);
-router.route('/add-new-product').post(validate(productValidation.addNewProduct), productController.addNewProduct);
+
+router
+  .route('/add-new-product')
+  .post(upload.array('image', 5), validate(productValidation.addNewProduct), productController.addNewProduct);
+  
 router.route('/bulk/add-new-product').post(auth(), productController.bulkAddNewProduct);
 router.route('/bulk/add-new-users').post(auth(), productController.bulkAddNewUsers);
 

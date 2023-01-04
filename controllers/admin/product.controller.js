@@ -139,7 +139,6 @@ export const panelDeleteProduct = catchAsync(async (req, res) => {
 
 export const addNewProduct = catchAsync(async (req, res) => {
   let { body } = req;
-
   const slug = body.name.toLowerCase().replace(' ', '-');
   const sku = body.sku.toLowerCase().replace(' ', '-');
   body.slug = `${slug}-${sku}`;
@@ -173,7 +172,6 @@ export const addNewProduct = catchAsync(async (req, res) => {
     body = await uploadToCloudinary(displayPicture, imageList, body);
     if (!body.error) {
       body = body.data;
-
       await productService.createProduct(body);
       return res.send({ message: 'Product added successfully', error: false });
     }
