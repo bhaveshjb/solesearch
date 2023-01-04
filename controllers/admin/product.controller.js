@@ -19,11 +19,11 @@ const csv = require('csvtojson');
 
 export const check = catchAsync(async (req, res) => {
   const status = await productService.productUpdate();
-  return res.send({ message: status });
+  return res.send({ message: status, error: false, data: {} });
 });
 export const sneakersList = catchAsync(async (req, res) => {
-  const filter = {};
-  const status = await productService.getProductList(filter);
+  const { offset } = req.body;
+  const status = await productService.sneakerList(offset);
   return res.send({ message: status });
 });
 
@@ -134,12 +134,11 @@ export const panelAddProduct = catchAsync(async (req, res) => {
 export const panelDeleteProduct = catchAsync(async (req, res) => {
   const { body } = req;
   await productService.deleteProductDetails(body);
-  return res.send({ results: 'done' });
+  return res.send({ message: 'Product deleted', error: false });
 });
 
 export const addNewProduct = catchAsync(async (req, res) => {
-  const { body } = req;
-
+  let { body } = req;
   const slug = body.name.toLowerCase().replace(' ', '-');
   const sku = body.sku.toLowerCase().replace(' ', '-');
   body.slug = `${slug}-${sku}`;
@@ -147,7 +146,7 @@ export const addNewProduct = catchAsync(async (req, res) => {
   const imageFiles = req.files;
   const imageList = [];
   let displayPicture = '';
-  if (imageFiles.length) {
+  if (imageFiles) {
     for (let i = 0; i < imageFiles.length; i += 1) {
       const fileContentType = imageFiles[i].mimetype.split('/');
       const fileType = fileContentType[1];
@@ -170,13 +169,19 @@ export const addNewProduct = catchAsync(async (req, res) => {
         }
       });
     }
-    await uploadToCloudinary(displayPicture, imageList, body);
+    body = await uploadToCloudinary(displayPicture, imageList, body);
+    if (!body.error) {
+      body = body.data;
+      await productService.createProduct(body);
+      return res.send({ message: 'Product added successfully', error: false });
+    }
+    res.send({ message: 'error in uploading images', error: true });
   }
 
-  // add method  upload_to_cloudinary to add upload images in cloudinary
   await productService.createProduct(body);
   return res.send({ message: 'Product added successfully', error: false });
 });
+
 export const bulkAddNewProduct = catchAsync(async (req, res) => {
   const rawData = req.files.file.data.toString();
   const productData = await csv({
@@ -279,8 +284,8 @@ export const relatedProducts = catchAsync(async (req, res) => {
 export const sellProduct = catchAsync(async (req, res) => {
   const productData = req.body;
   const userData = req.user;
-  const product = await productService.sellProductService(productData, userData);
-  return res.send({ results: product });
+  const status = await productService.sellProductService(productData, userData);
+  return res.send({ message: status, error: false });
 });
 export const storeFront = catchAsync(async (req, res) => {
   const filter = {
@@ -289,7 +294,7 @@ export const storeFront = catchAsync(async (req, res) => {
     sold: false,
   };
   const product = await productService.getStoreFront(filter);
-  return res.send({ results: product });
+  return res.send({ product, error: false });
 });
 export const storeFrontInactive = catchAsync(async (req, res) => {
   const productId = req.body.product_id;
@@ -306,8 +311,8 @@ export const soldProduct = catchAsync(async (req, res) => {
     inactive: false,
     customer_ordered: true,
   };
-  const product = await productService.getSoldProducts(filter);
-  return res.send({ results: product });
+  const products = await productService.getSoldProducts(filter);
+  return res.send({ products, error: false });
 });
 export const notFoundForm = catchAsync(async (req, res) => {
   const { body } = req;
@@ -326,7 +331,7 @@ export const orders = catchAsync(async (req, res) => {
     is_bid: false,
   };
   const order = await productService.getOrders(filter);
-  return res.send({ orders: order });
+  return res.send({ orders: order, error: false });
 });
 const checkIfProductBlocked = async (productId) => {
   const checkProduct = await redisClient.get(productId);
@@ -370,18 +375,18 @@ export const verifyPayment = catchAsync(async (req, res) => {
 });
 export const productReview = catchAsync(async (req, res) => {
   const { user } = req;
-  const productReviewList = await productService.listProductReview(user);
-  return res.send({ results: productReviewList });
+  const reviewProductList = await productService.listProductReview(user);
+  return res.send({ product: reviewProductList, error: false });
 });
 export const confirmSellProduct = catchAsync(async (req, res) => {
   const { id } = req.body;
-  const productReviewList = await productService.sellConfirmation(id);
-  return res.send({ results: productReviewList });
+  const status = await productService.sellConfirmation(id);
+  return res.send({ message: status, error: false });
 });
 export const rejectSellProduct = catchAsync(async (req, res) => {
   const { id } = req.body;
-  const productReviewList = await productService.sellDecline(id);
-  return res.send({ results: productReviewList });
+  const product = await productService.sellDecline(id);
+  return res.send({ product, error: false });
 });
 
 export const update = catchAsync(async (req, res) => {

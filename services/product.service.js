@@ -4,6 +4,8 @@ import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
 import { esclient } from '../utils/elasticSearch';
 import generateProductId from '../utils/generateProductId';
+// import { sendEmail } from './email.service';
+
 
 const elasticbulk = require('elasticbulk');
 
@@ -42,26 +44,6 @@ export async function getObjectByProductId(productId) {
   return { found: true };
 }
 
-export async function productUpdate() {
-  const slugs = [
-    "nike-dunk-low-'varsity-royal'-cu1726100",
-    "air-jordan-1-high-og-'lost-and-found'-dz5485612",
-    "travis-scott-x-air-jordan-1-low-og-'reverse-mocha'-dm7866162",
-    'fragment-design-x-travis-scott-x-air-jordan-1-retro-low-dm7866140',
-    "union-la-x-air-jordan-1-retro-high-nrg-'black-toe'-bv1300106",
-    "air-jordan-1-mid-se-'black-and-white'-dh6933100",
-    "dunk-low-'pure-platinum'-dj6188001",
-    'nike-air-force-1-mid-x-off-white-black-do6290-001',
-    "nike-sb-dunk-low-'why-so-sad'-dx5549400",
-    "union-la-x-dunk-low-'passport-pack---argon'-dj9649400",
-    "yeezy-foam-runner-'onyx'-hp8739",
-  ];
-  slugs.map(async (slug) => {
-    await Product.updateMany({ slug }, { on_sale: true });
-  });
-  return 'Done';
-}
-
 export async function getProductById(id, options) {
   const product = await Product.findById(id, options);
   return product;
@@ -86,7 +68,7 @@ export async function updateProduct(filter, body, options) {
     const product = Product.findOneAndUpdate(filter, body, options);
     return product;
   } catch (error) {
-    logger.error('error in creating Product:', error);
+    logger.error('error in updating Product:', error);
     if (error.name === 'MongoError' && error.code === 11000) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You are trying to create duplicate entry!');
     } else {
@@ -95,6 +77,30 @@ export async function updateProduct(filter, body, options) {
   }
 }
 
+export async function productUpdate() {
+  const slugs = [
+    "nike-dunk-low-'varsity-royal'-cu1726100",
+    "air-jordan-1-high-og-'lost-and-found'-dz5485612",
+    "travis-scott-x-air-jordan-1-low-og-'reverse-mocha'-dm7866162",
+    'fragment-design-x-travis-scott-x-air-jordan-1-retro-low-dm7866140',
+    "union-la-x-air-jordan-1-retro-high-nrg-'black-toe'-bv1300106",
+    "air-jordan-1-mid-se-'black-and-white'-dh6933100",
+    "dunk-low-'pure-platinum'-dj6188001",
+    'nike-air-force-1-mid-x-off-white-black-do6290-001',
+    "nike-sb-dunk-low-'why-so-sad'-dx5549400",
+    "union-la-x-dunk-low-'passport-pack---argon'-dj9649400",
+    "yeezy-foam-runner-'onyx'-hp8739",
+  ];
+  slugs.map(async (slug) => {
+    const products = await updateProduct({ slug }, { on_sale: true });
+    return products;
+  });
+  return 'Done';
+}
+export async function sneakerList(offset) {
+  const productList = await Product.find({}).skip(offset).limit(20);
+  return productList;
+}
 export async function createProduct(body) {
   try {
     const product = await esclient.index({ index: 'seller', body });
@@ -337,7 +343,7 @@ export async function getProductDetail(productData) {
 }
 export async function sellProductService(productData, userData) {
   const productDetail = await getProductDetail(productData);
-
+  productDetail.product_id = generateProductId(productData);
   productDetail.seller_email = userData.email;
   productDetail.size = productData.size;
   productDetail.product_listed_on_dryp = false;
@@ -349,9 +355,8 @@ export async function sellProductService(productData, userData) {
   productDetail.reject_product = false;
   productDetail.sold = false;
   productDetail.inactive = false;
-
   await Product.create(productDetail);
-  return { message: 'Product added for review' };
+  return 'Product added for review';
 }
 export async function getStoreFront(filter) {
   const options = {};
@@ -405,10 +410,19 @@ export async function sellConfirmation(id) {
   const filter = {
     _id: id,
   };
-  const product = await Product.findOneAndUpdate(filter, { product_listed_on_dryp: true }).lean();
-  // TODO: send email
+  await Product.findOneAndUpdate(filter, { product_listed_on_dryp: true }).lean();
+  const product = await Product.findOne(filter);
+
+  //   // TODO: send email
+  //   const subject = `Product Accepted ${product.name}`;
+  //   const text = `Your product is now listed on SoleSearch.
+  // Product: ${product.name}
+  // Size: ${product.size}
+  // Price: ${product.price}`;
+  //   const to = product.seller_email;
+  //   await sendEmail({ to, subject, text, isHtml: false });
   await getAlgolia(product);
-  return product;
+  return 'product added';
 }
 export async function sellDecline(id) {
   const filter = {
@@ -417,6 +431,13 @@ export async function sellDecline(id) {
   const product = await updateProduct(filter, { reject_product: true }, { new: true });
   // const product = await Product.findOneAndUpdate(filter, { reject_product: true });
   // TODO: send email
+  //   const subject = `Product Rejected ${product.name}`;
+  //   const text = `Your product has been rejected.
+  // Product: ${product.name}
+  // Size: ${product.size}
+  // Price: ${product.price}
+  //
+  // If you think this could be an error, please reply to this email and we will reach out to you.`;
   return product;
 }
 export async function updateBuyerIndexProducts(slug, args) {

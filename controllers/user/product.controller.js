@@ -65,7 +65,7 @@ export const sellProduct = catchAsync(async (req, res) => {
   const productData = req.body;
   const userData = req.user;
   const product = await productService.sellProductService(productData, userData);
-  return res.send({ results: product });
+  return res.send({ message: product });
 });
 
 export const storeFront = catchAsync(async (req, res) => {
@@ -75,7 +75,7 @@ export const storeFront = catchAsync(async (req, res) => {
     sold: false,
   };
   const product = await productService.getStoreFront(filter);
-  return res.send({ results: product });
+  return res.send({ product, error: false });
 });
 export const storeFrontInactive = catchAsync(async (req, res) => {
   const productId = req.body.product_id;

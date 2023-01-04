@@ -23,6 +23,9 @@ const envVarsSchema = Joi.object()
     RESET_PASSWORD_CODE_SIZE: Joi.number().default(6),
     FACEBOOK_CLIENT_ID: Joi.string().required().description('Facebook Client is required'),
     FACEBOOK_CLIENT_SECRET: Joi.string().required().description('facebook Client Secret is required'),
+    CLOUDNIARY_CLOUD_NAME: Joi.string().description('cloud name of cloudniary that will store the images'),
+    CLOUDNIARY_API_KEY: Joi.string().description('API key for cloudniary'),
+    CLOUDNIARY_API_SECRET: Joi.string().description('API secret for cloudniary'),
   })
   .unknown();
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
@@ -75,5 +78,10 @@ export default {
   superUser: {
     username: envVars.SUPERUSER_USERNAME,
     password: envVars.SUPERUSER_PASSWORD,
+  },
+  cloudniary: {
+    cloudName: envVars.CLOUDNIARY_CLOUD_NAME,
+    apiKey: envVars.CLOUDNIARY_API_KEY,
+    apiSecret: envVars.CLOUDNIARY_API_SECRET,
   },
 };

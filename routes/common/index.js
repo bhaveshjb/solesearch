@@ -79,7 +79,7 @@ router
   .delete(auth(), validate(productValidation.storeFrontInactive), productController.storeFrontInactive);
 router.route('/sold-product').get(auth(), productController.soldProduct);
 router.route('/not-found-form').post(auth(), validate(productValidation.notFoundForm), productController.notFoundForm);
-router.route('/Orders').get(auth(), productController.orders);
+router.route('/orders').get(auth(), productController.orders);
 
 // Buy Product
 router.route('/buy-product').post(auth(), validate(productValidation.makePayment), productController.makePayment);
