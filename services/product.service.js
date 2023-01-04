@@ -6,7 +6,6 @@ import { esclient } from '../utils/elasticSearch';
 import generateProductId from '../utils/generateProductId';
 // import { sendEmail } from './email.service';
 
-
 const elasticbulk = require('elasticbulk');
 
 async function getOriginalPrice(productPrice, isBid = false) {

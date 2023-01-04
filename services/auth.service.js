@@ -5,6 +5,7 @@ import { userService, tokenService, emailService } from 'services';
 import { EnumTypeOfToken, EnumCodeTypeOfCode } from 'models/enum.model';
 import bcrypt from 'bcryptjs';
 import { generateOtp } from 'utils/common';
+import { generateAuthTokens } from './token.service';
 /**
  * Login with username and password
  * @param {string} email
@@ -34,7 +35,7 @@ export const verifyEmail = async (verifyRequest) => {
   const filter = {
     _id: user,
   };
-  return userService.updateUser(filter, { emailVerified: true, isRegistered: true, isVerified: true });
+  return userService.updateUser(filter, { isRegistered: true, isVerified: true });
 };
 
 /**
@@ -147,7 +148,7 @@ export const createSocialUser = async (accessToken, refreshToken, profile, provi
       id: profile.id,
       token: accessToken,
     };
-    userObj.emailVerified = true;
+    userObj.isVerified = true;
   }
   userObj.password = Math.random().toString(36).slice(-10);
   return User.findOne(query).then(async (user) => {
@@ -164,9 +165,13 @@ export const createSocialUser = async (accessToken, refreshToken, profile, provi
     }).lean();
   });
 };
-export const setNewPassword = async (password, user) => {
+export const setNewPassword = async (password, userInfo) => {
   const filter = {
-    _id: user._id,
+    email: userInfo.email,
   };
-  return userService.updateUser(filter, { password, isVerified: true });
+  const options = { new: true };
+  const user = await userService.updateUser(filter, { password, isVerified: true }, options);
+
+  const token = await generateAuthTokens(userInfo);
+  return { token: token.access.token, user };
 };

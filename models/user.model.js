@@ -1,25 +1,25 @@
 import mongoose from 'mongoose';
 import mongoosePaginateV2 from 'mongoose-paginate-v2';
 import { toJSON } from 'models/plugins';
-import enumModel from 'models/enum.model';
+// import enumModel from 'models/enum.model';
 
 const bcrypt = require('bcryptjs');
 
-const CodeSchema = new mongoose.Schema({
-  code: {
-    type: String,
-  },
-  expirationDate: {
-    type: Date,
-  },
-  used: {
-    type: Boolean,
-  },
-  codeType: {
-    type: String,
-    enum: Object.values(enumModel.EnumCodeTypeOfCode),
-  },
-});
+// const CodeSchema = new mongoose.Schema({
+//   code: {
+//     type: String,
+//   },
+//   expirationDate: {
+//     type: Date,
+//   },
+//   used: {
+//     type: Boolean,
+//   },
+//   codeType: {
+//     type: String,
+//     enum: Object.values(enumModel.EnumCodeTypeOfCode),
+//   },
+// });
 // const OauthSchema = new mongoose.Schema({
 //   id: {
 //     type: String,
@@ -82,16 +82,16 @@ const UserSchema = new mongoose.Schema({
   /**
    * For email verification
    * */
-  emailVerified: {
-    type: Boolean,
-    private: true,
-  },
+  // emailVerified: {
+  //   type: Boolean,
+  //   private: true,
+  // },
   /**
    * custom server authentication
    * */
-  codes: {
-    type: [CodeSchema],
-  },
+  // codes: {
+  //   type: [CodeSchema],
+  // },
   /**
    * password for authentication
    * */

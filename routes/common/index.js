@@ -17,11 +17,16 @@ const router = express.Router();
 router.route('/check').post(auth(), productController.check);
 router.route('/sneakers').post(auth(), productController.sneakersList);
 router.post('/register', validate(authValidation.register), authController.register);
-router.put('/user-update', auth(), authController.updateUserInfo);
+router.put('/user-update', auth(), validate(authValidation.updateUserInfo), authController.updateUserInfo);
 router.post('/login', validate(authValidation.login), authController.login);
 router.patch('/set-new-password', auth(), validate(authValidation.userSetPassword), authController.userSetPassword);
 router.patch('/verifyUser', auth(), authController.verifyUser);
-router.post('/logout', auth(), validate(authValidation.logout), authController.logout);
+router.post('/logout', auth(), authController.logout);
+// router.post(
+//   '/send-verification-link',
+//   validate(authValidation.userSendVerificationLink),
+//   authController.userSendVerificationLink
+// );
 router.post(
   '/facebook-signup-login',
   validate(authValidation.faceBookLogin),
@@ -51,8 +56,6 @@ router
 router.route('/filters').post(validate(productValidation.filters), productController.filters);
 router.route('/query-results/:query').get(validate(productValidation.queryResults), productController.queryResults);
 
-
-
 router
   .route('/panel-add-product')
   .post(upload.array('image', 5), validate(productValidation.panelAddProduct), productController.panelAddProduct);
@@ -66,9 +69,9 @@ router.route('/reject-review').patch(validate(productValidation.rejectSellProduc
 router
   .route('/add-new-product')
   .post(upload.array('image', 5), validate(productValidation.addNewProduct), productController.addNewProduct);
-  
-router.route('/bulk/add-new-product').post(auth(), productController.bulkAddNewProduct);
-router.route('/bulk/add-new-users').post(auth(), productController.bulkAddNewUsers);
+
+router.route('/bulk/add-new-product').post(productController.bulkAddNewProduct);
+router.route('/bulk/add-new-users').post(productController.bulkAddNewUsers);
 
 // sell products
 router.route('/sell-product').post(auth(), validate(productValidation.sellProduct), productController.sellProduct);
@@ -101,7 +104,7 @@ router
   .post(auth(), validate(userValidation.addDefaultAddress), userController.addDefaultAddress);
 
 // Subscribe collectible
-router.route('/subscribers').post(auth(), validate(subscriptionValidation.subscribe), subscriptionController.subscribe);
+router.route('/subscribers').post(validate(subscriptionValidation.subscribe), subscriptionController.subscribe);
 
 // Customer Support
 router.route('/customer-support').post(auth(), validate(userValidation.customerSupport), userController.customerSupport);

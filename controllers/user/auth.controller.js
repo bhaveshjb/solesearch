@@ -23,12 +23,20 @@ export const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ results: { user, tokens } });
+  res.send({
+    message: `Logged in as ${email}`,
+    access_token: tokens.access,
+    refresh_token: tokens.refresh,
+    user,
+    error: false,
+  });
 });
 
 export const userSetPassword = catchAsync(async (req, res) => {
-  await authService.setNewPassword(req.body.password, req.user);
-  res.status(httpStatus.OK).send({ results: { success: true, message: 'Password has been reset successfully' } });
+  const status = await authService.setNewPassword(req.body.password, req.user);
+  res
+    .status(httpStatus.OK)
+    .send({ message: 'Password has been reset successfully', access_token: status.token, user: status.user, error: false });
 });
 
 // if user's email is not verified then we call this function for reverification
@@ -120,8 +128,9 @@ export const userInfo = catchAsync(async (req, res) => {
 
 export const verifyUser = catchAsync(async (req, res) => {
   const filter = { email: req.user.email };
-  await userService.getVerifyUser(filter);
-  res.send({ message: 'Your profile has been verified successfully' });
+  const options = { new: true };
+  const user = await userService.getVerifyUser(filter, options);
+  res.send({ message: 'Your profile has been verified successfully', user, error: false });
 });
 
 /**
@@ -130,8 +139,9 @@ export const verifyUser = catchAsync(async (req, res) => {
  */
 export const updateUserInfo = catchAsync(async (req, res) => {
   const filter = { email: req.user.email };
-  const user = await userService.updateUser(filter, req.body);
-  res.send({ user });
+  const option = { new: true };
+  const user = await userService.updateUser(filter, req.body, option);
+  res.send({ message: 'User updated successfully', user, error: false });
 });
 
 export const sendVerifyOtp = catchAsync(async (req, res) => {
@@ -141,7 +151,7 @@ export const sendVerifyOtp = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'no user found with this id!');
   }
-  if (user.emailVerified) {
+  if (user.isVerified) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'your email is already verified!');
   }
   user.codes.push({
@@ -166,8 +176,8 @@ export const refreshTokens = catchAsync(async (req, res) => {
 });
 
 export const logout = catchAsync(async (req, res) => {
-  await tokenService.invalidateToken(req.body);
-  res.send({ results: { success: true } });
+  await tokenService.invalidateToken(req.rawHeaders[1]);
+  res.send({ message: 'Successfully logged out' });
 });
 
 export const socialLogin = catchAsync(async (req, res) => {
@@ -175,3 +185,9 @@ export const socialLogin = catchAsync(async (req, res) => {
   const token = await tokenService.generateAuthTokens(req.user);
   return res.json({ results: { user, token } });
 });
+
+// export const userSendVerificationLink = catchAsync(async (req, res) => {
+//   // const user = await authService.socialLogin(req.user);
+//   // const token = await tokenService.generateAuthTokens(req.user);
+//   // return res.json({ results: { user, token } });
+// });
