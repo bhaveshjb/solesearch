@@ -81,7 +81,7 @@ export default {
     password: envVars.SUPERUSER_PASSWORD,
   },
   es: {
-    esUrl: envVars.ELASTIC_SEARCH_URL,
+    url: envVars.ELASTIC_SEARCH_URL,
   },
   cloudniary: {
     cloudName: envVars.CLOUDNIARY_CLOUD_NAME,

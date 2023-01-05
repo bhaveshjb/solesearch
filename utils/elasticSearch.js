@@ -5,7 +5,7 @@ require('@elastic/elasticsearch');
 const elasticsearch = require('elasticsearch');
 
 const esclient = new elasticsearch.Client({
-  host: config.es.esUrl,
+  host: config.es.url,
 });
 
 // async function run() {
