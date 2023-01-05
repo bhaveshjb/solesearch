@@ -491,12 +491,19 @@ export const productsWithFilters = catchAsync(async (req, res) => {
 export const productFilterByQuery = catchAsync(async (req, res) => {
   const { body } = req;
   const products = await productService.productFilter(body);
-  return res.send({ products });
+  if (!products.error) {
+    return res.send({ data: products.data, error: false });
+  }
+  return res.send({ data: products.data, error: true, message: products.message });
 });
 export const filters = catchAsync(async (req, res) => {
   const { body } = req;
-  const products = await productService.getFilters(body);
-  return res.send({ products });
+  try {
+    const products = await productService.getFilters(body);
+    return res.send({ error: false, aggregations: products });
+  } catch (e) {
+    throw new Error(`error=> ${e}`);
+  }
 });
 export const queryResults = catchAsync(async (req, res) => {
   const { query } = req.params;

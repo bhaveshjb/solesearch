@@ -694,25 +694,28 @@ export async function productFilter(body) {
   if (sortOrder === 'asc') {
     value = 1;
   } else {
-    value = 0;
+    value = -1;
   }
   aggregate.push({ $sort: { sort_type: value } });
   try {
     const products = await Product.aggregate(aggregate);
     if (products.length) {
-      return { data: { total: products.length, products: products[body.from + size] } };
+      return { data: { total: products.length, products: products.slice(body.from, body.from + size) }, error: false };
     }
-    return { message: 'no data available' };
+    return { message: 'no data available', data: {}, error: true };
   } catch (e) {
-    logger.error('error in productFilter:', e.message);
+    logger.error(`error in productFilter: ${e.message}`);
+    throw new Error(`${e}`);
   }
 }
 export async function getFilters(body) {
-  // const order = await Transaction.find(filter);
-  // return order;
-  Object.assign(body, { size: 0 });
-  const products = await esclient.search({ index: 'buyer', body });
-  return products.aggregations;
+  try {
+    Object.assign(body, { size: 0 });
+    const products = await esclient.search({ index: 'buyer', body });
+    return products.aggregations;
+  } catch (e) {
+    throw new Error(`${e}`);
+  }
 }
 export async function getQueryResults(query) {
   const results = {};
