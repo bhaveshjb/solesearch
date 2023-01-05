@@ -21,6 +21,7 @@ const envVarsSchema = Joi.object()
     FRONT_URL: Joi.string().description('frontend url for email service'),
     PARTY_USER_LIMIT: Joi.number().default(8),
     RESET_PASSWORD_CODE_SIZE: Joi.number().default(6),
+    ELASTIC_SEARCH_URL: Joi.string(),
     FACEBOOK_CLIENT_ID: Joi.string().required().description('Facebook Client is required'),
     FACEBOOK_CLIENT_SECRET: Joi.string().required().description('facebook Client Secret is required'),
     CLOUDNIARY_CLOUD_NAME: Joi.string().description('cloud name of cloudniary that will store the images'),
@@ -78,6 +79,9 @@ export default {
   superUser: {
     username: envVars.SUPERUSER_USERNAME,
     password: envVars.SUPERUSER_PASSWORD,
+  },
+  elasticsearch: {
+    url: envVars.ELASTIC_SEARCH_URL,
   },
   cloudniary: {
     cloudName: envVars.CLOUDNIARY_CLOUD_NAME,
