@@ -43,7 +43,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // sanitize request data
 app.use(xss());
+
+/**
+ * to prevent malicious users to send an object containing a $ operator, or including a ., which could change the context of a database operation. we use mongoSanitize().
+ * By default, $ and . characters are removed completely from user-supplied input from req.body, req.params, req.headers, req.query.
+ * here we added option  allowDots: true , so it will only sanitize $ characters , but allow .(dot) character , so we can get the proper request including .(dot) to perform operations as we required.
+ * */
 app.use(mongoSanitize({ allowDots: true }));
+
 // gzip compression
 app.use(compression());
 // set api response
