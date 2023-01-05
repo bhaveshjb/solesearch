@@ -54,9 +54,9 @@ export async function addAddressService(filter, body, options) {
   return user.address[user.address.length - 1];
 }
 
-export async function getVerifyUser(filter) {
-  await User.findOneAndUpdate(filter, { isVerified: true });
-  return true;
+export async function getVerifyUser(filter, options) {
+  const user = await User.findOneAndUpdate(filter, { isVerified: true }, options);
+  return user;
 }
 export async function editAddressService(filter, body) {
   const status = await User.updateOne(

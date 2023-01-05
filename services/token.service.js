@@ -84,7 +84,7 @@ export const verifyOtp = async (email, otp) => {
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'no user found with this email');
   }
-  if (user.emailVerified) {
+  if (user.isVerified) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'your email is already verified!');
   }
   // eslint-disable-next-line eqeqeq
@@ -93,7 +93,7 @@ export const verifyOtp = async (email, otp) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'otp is Invalid');
   }
   user.codes = _.filter(user.codes, (code) => code.code !== otp);
-  user.emailVerified = true;
+  user.isVerified = true;
   user.active = true;
   return user.save();
 };
@@ -165,7 +165,7 @@ export const generateVerifyEmailToken = async (email) => {
   const user = await userService.getOne({ email });
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
-  } else if (user.emailVerified) {
+  } else if (user.isVerified) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email is already Verified');
   }
   const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
@@ -198,6 +198,16 @@ export const generateAuthTokens = async (user) => {
   };
 };
 
+export const setNewPasswordToken = async (email) => {
+  const user = await userService.getOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+  }
+  await Token.deleteMany({ user: user.id, type: EnumTypeOfToken.REFRESH });
+  const newToken = await generateAuthTokens(user);
+  return newToken;
+};
+
 /**
  * Get auth tokens
  * @param {User} user
@@ -227,7 +237,7 @@ export const getAuthTokens = async (user, token) => {
  * @param {Object}  invalidReq
  */
 export const invalidateToken = async (invalidReq) => {
-  const { refreshToken: token } = invalidReq;
+  const token = invalidReq;
   const tokenDoc = await Token.findOne({ type: EnumTypeOfToken.REFRESH, token });
   if (!tokenDoc) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Token not found');

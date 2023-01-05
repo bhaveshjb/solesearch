@@ -64,7 +64,7 @@ export const sendEmailVerificationEmail = async (user, token) => {
   const { email: to, name } = user;
   const subject = 'Welcome to the Swaray Family!';
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `${config.front.url}/v1/client/auth/verify-email?token=${token}`;
+  const resetPasswordUrl = `${config.front.url}/admin-panel/client/auth/verify-email?token=${token}`;
   const text = `
 <html lang="en">
 <head>

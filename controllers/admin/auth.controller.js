@@ -120,7 +120,7 @@ export const userInfo = catchAsync(async (req, res) => {
 export const updateUserInfo = catchAsync(async (req, res) => {
   const filter = { _id: req.user._id };
   const user = await userService.updateUser(filter, req.body);
-  res.send({ user });
+  res.send({ message: 'User updated successfully', user, error: false });
 });
 
 export const sendVerifyOtp = catchAsync(async (req, res) => {
@@ -130,7 +130,7 @@ export const sendVerifyOtp = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'no user found with this id!');
   }
-  if (user.emailVerified) {
+  if (user.isVerified) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'your email is already verified!');
   }
   user.codes.push({

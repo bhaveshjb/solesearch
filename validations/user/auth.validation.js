@@ -26,6 +26,13 @@ export const verifyEmail = {
   }),
 };
 
+export const updateUserInfo = {
+  body: Joi.object().keys({
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+  }),
+};
+
 export const forgotPassword = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
@@ -100,6 +107,13 @@ export const changePassword = {
 export const sendVerifyEmail = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
+  }),
+};
+
+export const userSendVerificationLink = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    reset: Joi.boolean(),
   }),
 };
 
