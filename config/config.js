@@ -80,7 +80,7 @@ export default {
     username: envVars.SUPERUSER_USERNAME,
     password: envVars.SUPERUSER_PASSWORD,
   },
-  es: {
+  elasticsearch: {
     url: envVars.ELASTIC_SEARCH_URL,
   },
   cloudniary: {
