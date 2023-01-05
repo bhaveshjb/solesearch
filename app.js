@@ -43,7 +43,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // sanitize request data
 app.use(xss());
-app.use(mongoSanitize());
+app.use(mongoSanitize({ allowDots: true }));
 // gzip compression
 app.use(compression());
 // set api response
