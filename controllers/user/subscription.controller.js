@@ -60,7 +60,7 @@ export const subscribe = catchAsync(async (req, res) => {
   const { body } = req;
   try {
     const getSubscribe = await subscriptionService.addSubscription(body);
-    return res.send({ message: getSubscribe });
+    return res.send({ message: getSubscribe.message, error: getSubscribe.error });
   } catch (e) {
     throw new Error(`error from subscribe: ${e.message}`);
   }

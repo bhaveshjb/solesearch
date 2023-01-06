@@ -147,8 +147,8 @@ export const wishList = {
 export const customerSupport = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
-    firstName: Joi.string().required(),
-    lastName: Joi.string(),
+    first_name: Joi.string().required(),
+    last_name: Joi.string(),
     phone_number: Joi.string().required(),
     issue_type: Joi.string().required(),
     reference_number: Joi.string().required(),

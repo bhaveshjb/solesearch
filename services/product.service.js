@@ -2,11 +2,8 @@ import ApiError from 'utils/ApiError';
 import httpStatus from 'http-status';
 import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
-import { esclient } from '../utils/elasticSearch';
+import esclient from '../utils/elasticSearch';
 import generateProductId from '../utils/generateProductId';
-// import { sendEmail } from './email.service';
-
-const elasticbulk = require('elasticbulk');
 
 async function getOriginalPrice(productPrice, isBid = false) {
   let price = Math.floor(productPrice);
@@ -113,6 +110,8 @@ export async function bulkAdd(index, data) {
   try {
     const products = [];
     data.map((product) => {
+      const gender = product.gender ? product.gender.split('-') : [];
+      delete product.gender;
       let sku;
       if (product.sku) {
         sku = product.sku.toLowerCase().replace(' ', '-');
@@ -120,17 +119,16 @@ export async function bulkAdd(index, data) {
         sku = '';
       }
       const addData = {
-        gender: product.gender,
+        gender,
         slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
         main_picture_url: 'display_picture.png',
       };
+      products.push({ index: { _index: index } });
       products.push(Object.assign(product, addData));
       return products;
     });
-
-    await elasticbulk.import(products, {
-      index,
-      host: 'http://localhost:9200',
+    await esclient.bulk({
+      body: products,
     });
   } catch (error) {
     logger.error('error in bulkAdd Product:', error.message);
@@ -151,8 +149,6 @@ export async function bulkSell(sellerEmail, data) {
       }
       product.price = 0.09 * parseInt(price, 10) + parseInt(price, 10) + 2000;
       product.gender = gender;
-      product.price = 1000;
-      product.size = '8';
       const encodedProductId = generateProductId(data);
       const validatedProduct = {
         slug: `${product.name.toLowerCase().replace(' ', '-')}-${sku}`,
@@ -702,7 +698,7 @@ export async function productFilter(body) {
     if (products.length) {
       return { data: { total: products.length, products: products.slice(body.from, body.from + size) }, error: false };
     }
-    return { message: 'no data available', data: {}, error: true };
+    return { data: { message: 'no data available', data: {} }, error: true };
   } catch (e) {
     logger.error(`error in productFilter: ${e.message}`);
     throw new Error(`${e}`);

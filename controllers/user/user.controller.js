@@ -140,7 +140,11 @@ export const customerSupport = catchAsync(async (req, res) => {
   const acknowledgmentText =
     'Your request has been acknowledged and is currently being processed.Our customer agent will get back to you shortly.';
   const helpdesk = 'support@solesearchindia.zohodesk.in';
-  await sendEmail({ helpdesk, subject, emailContentText, isHtml: false });
-  await sendEmail({ email, subject, acknowledgmentText, isHtml: false });
-  return res.send({ message: 'done' });
+  try {
+    await sendEmail({ helpdesk, subject, emailContentText, isHtml: false });
+    await sendEmail({ email, subject: 'Customer Request Acknowledgment', acknowledgmentText, isHtml: false });
+    return res.send({ message: 'done' });
+  } catch (e) {
+    throw new Error(`error in send email: ${e.message}`);
+  }
 });
