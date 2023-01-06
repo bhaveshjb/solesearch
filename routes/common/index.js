@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import fileUpload from 'express-fileupload';
 import auth from '../../middlewares/auth';
 import validate from '../../middlewares/validate';
 import { productController } from '../../controllers/admin';
@@ -39,7 +40,7 @@ router
   .get(auth(), userController.wishList);
 
 // Elastic search GET APIs from vue frontend
-router.route('/collection').get(productController.collection);
+router.route('/collections').get(productController.collection);
 router.route('/search/:index/:query_string/:size').get(validate(productValidation.search), productController.search);
 router
   .route('/selected-product/:slug')
@@ -70,12 +71,12 @@ router
   .route('/add-new-product')
   .post(upload.array('image', 5), validate(productValidation.addNewProduct), productController.addNewProduct);
 
-router.route('/bulk/add-new-product').post(productController.bulkAddNewProduct);
-router.route('/bulk/add-new-users').post(productController.bulkAddNewUsers);
+router.route('/bulk/add-new-product').post(fileUpload(), productController.bulkAddNewProduct);
+router.route('/bulk/add-new-users').post(fileUpload(), productController.bulkAddNewUsers);
 
 // sell products
 router.route('/sell-product').post(auth(), validate(productValidation.sellProduct), productController.sellProduct);
-router.route('/bulk/sell-product').post(auth(), productController.bulkSellProduct);
+router.route('/bulk/sell-product').post(auth(), fileUpload(), productController.bulkSellProduct);
 router
   .route('/store-front')
   .get(auth(), productController.storeFront)

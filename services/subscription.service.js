@@ -56,10 +56,10 @@ export async function addSubscription(body) {
     if (!subscribed) {
       await Subscription.create({ collections, email });
       await sendEmail({ to, subject, text, isHtml: false });
-      return { message: 'Subscription added' };
+      return { message: 'Subscription added', error: false };
     }
     await sendEmail({ to, subject, text, isHtml: false });
-    return { message: 'Subscription added' };
+    return { message: 'Subscription added', error: false };
   } catch (e) {
     throw new Error(`addSubscription error: ${e.message}`);
   }

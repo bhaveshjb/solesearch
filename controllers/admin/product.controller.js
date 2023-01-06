@@ -186,20 +186,40 @@ export const bulkAddNewProduct = catchAsync(async (req, res) => {
   const rawData = req.files.file.data.toString();
   const productData = await csv({
     noheader: true,
-    headers: ['name', 'description', 'product_type', 'gender', 'brand_name', 'color'],
+    // headers: ['name', 'description', 'product_type', 'gender', 'brand_name', 'color'],
     output: 'csv',
   }).fromString(rawData);
+  const headers = [
+    'name',
+    'description',
+    'product_type',
+    'gender',
+    'release_year',
+    'colourway',
+    'sku',
+    'nickname',
+    'brand_name',
+    'silhouette',
+    'color',
+  ];
   const requiredHeaders = ['name', 'description', 'product_type', 'gender', 'brand_name', 'color'];
   const fileHeaders = productData[0].map((v) => v.toLowerCase());
-  const checkHeader = [];
-  fileHeaders.map((ele) => {
-    const result = requiredHeaders.includes(ele);
-    checkHeader.push(result);
-    return checkHeader;
+
+  fileHeaders.map((header) => {
+    if (!headers.includes(header)) {
+      throw new Error(`Csv file headers are incorrect , unexpected header ${header}.`);
+    }
+    return 0;
   });
-  if (checkHeader.includes(false)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Csv file headers are incorrect');
-  }
+
+  requiredHeaders.map((header) => {
+    if (!fileHeaders.includes(header)) {
+      throw new Error(`Csv file headers are incorrect , missing header ${header}`);
+    }
+    return 0;
+  });
+
+  delete productData[0];
   const results = [];
   productData.map((arr) => {
     const obj = {
@@ -221,22 +241,42 @@ export const bulkSellProduct = catchAsync(async (req, res) => {
   const rawData = req.files.file.data.toString();
   const productData = await csv({
     noheader: true,
-    headers: ['name', 'description', 'product_type', 'gender', 'brand_name', 'color', 'price', 'size'],
+    // headers: ['name', 'description', 'product_type', 'gender', 'brand_name', 'color', 'price', 'size'],
     output: 'csv',
   }).fromString(rawData);
+  const headers = [
+    'name',
+    'description',
+    'product_type',
+    'gender',
+    'release_year',
+    'colourway',
+    'sku',
+    'nickname',
+    'brand_name',
+    'silhouette',
+    'color',
+    'price',
+    'size',
+  ];
   const requiredHeaders = ['name', 'description', 'product_type', 'gender', 'brand_name', 'color', 'price', 'size'];
   const fileHeaders = productData[0].map((v) => v.toLowerCase());
-  const checkHeader = [];
-  fileHeaders.map((ele) => {
-    const result = requiredHeaders.includes(ele);
-    checkHeader.push(result);
-    return checkHeader;
-  });
-  if (checkHeader.includes(false)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Csv file headers are incorrect');
-  }
-  const results = [];
 
+  fileHeaders.map((header) => {
+    if (!headers.includes(header)) {
+      throw new Error(`Csv file headers are incorrect , unexpected header ${header}.`);
+    }
+    return 0;
+  });
+
+  requiredHeaders.map((header) => {
+    if (!fileHeaders.includes(header)) {
+      throw new Error(`Csv file headers are incorrect , missing header ${header}`);
+    }
+    return 0;
+  });
+  const results = [];
+  delete productData[0];
   productData.map((arr) => {
     const obj = {
       name: arr[0],
@@ -252,7 +292,7 @@ export const bulkSellProduct = catchAsync(async (req, res) => {
     return results;
   });
   await productService.bulkSell(req.user.email, results);
-  return res.send({ error: false, message: 'Products added successfully.' });
+  return res.send({ error: false, message: 'Products added for review' });
 });
 
 export const bulkAddNewUsers = catchAsync(async (req, res) => {
@@ -322,7 +362,7 @@ export const notFoundForm = catchAsync(async (req, res) => {
   const subject = 'Product request';
   const to = ' info@solesearchindia.com';
   await sendEmail({ to, subject, emailContentText });
-  return res.send({ message: 'success' });
+  return res.send({ message: 'success', error: false });
 });
 
 export const orders = catchAsync(async (req, res) => {
@@ -491,10 +531,7 @@ export const productsWithFilters = catchAsync(async (req, res) => {
 export const productFilterByQuery = catchAsync(async (req, res) => {
   const { body } = req;
   const products = await productService.productFilter(body);
-  if (!products.error) {
-    return res.send({ data: products.data, error: false });
-  }
-  return res.send({ data: products.data, error: true, message: products.message });
+  return res.send({ data: products.data, error: products.error });
 });
 export const filters = catchAsync(async (req, res) => {
   const { body } = req;

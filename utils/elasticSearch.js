@@ -18,4 +18,4 @@ const esclient = new elasticsearch.Client({
 // }
 // run().catch();
 
-module.exports = { esclient };
+module.exports = esclient;
