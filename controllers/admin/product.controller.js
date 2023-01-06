@@ -486,7 +486,7 @@ export const getOnSaleProducts = catchAsync(async (req, res) => {
 export const productsWithFilters = catchAsync(async (req, res) => {
   const { body } = req;
   const products = await productService.getProducts(body);
-  return res.send({ products });
+  return res.send({ products, error: false });
 });
 export const productFilterByQuery = catchAsync(async (req, res) => {
   const { body } = req;

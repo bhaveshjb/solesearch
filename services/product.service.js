@@ -2,7 +2,7 @@ import ApiError from 'utils/ApiError';
 import httpStatus from 'http-status';
 import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
-import { esclient } from '../utils/elasticSearch';
+import esclient from '../utils/elasticSearch';
 import generateProductId from '../utils/generateProductId';
 // import { sendEmail } from './email.service';
 
@@ -255,7 +255,12 @@ export async function getProductDetails(slug) {
     },
   };
   const productDetailsBySlug = await esclient.search({ index: 'seller', body: query });
-  const productAttributes = productDetailsBySlug.hits.hits[0]._source || [];
+  let productAttributes;
+  if (productDetailsBySlug.hits.total.value) {
+    productAttributes = productDetailsBySlug.hits.hits[0]._source;
+  } else {
+    productAttributes = [];
+  }
   const soldPrice = await Product.aggregate([
     { $match: { slug, customer_ordered: true } },
     {
@@ -526,7 +531,7 @@ export async function getProducts(args) {
     size: args.size,
     from: args.from,
     query: args.query,
-    sort: args.sort || [],
+    sort: args.sort ? args.sort : [],
   };
   const products = await esclient.search({ index: 'buyer', body });
   return products;
