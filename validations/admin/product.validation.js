@@ -195,8 +195,8 @@ export const productsWithFilters = {
   body: Joi.object().keys({
     size: Joi.number(),
     from: Joi.number(),
-    query: Joi.object(),
-    sort: Joi.object(),
+    query: Joi.any(),
+    sort: Joi.any(),
   }),
 };
 export const productFilterByQuery = {
