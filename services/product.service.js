@@ -4,6 +4,7 @@ import { Bids, Product, Transaction } from 'models';
 import { logger } from '../config/logger';
 import esclient from '../utils/elasticSearch';
 import generateProductId from '../utils/generateProductId';
+import { asyncForEach } from '../utils/common';
 // import { sendEmail } from './email.service';
 
 const elasticbulk = require('elasticbulk');
@@ -319,7 +320,10 @@ export async function getSelectedProduct(slug) {
     size: 1,
   };
   const product = await esclient.search({ index: 'seller', body: query });
-  return product.hits.hits[0];
+  if (product.hits.total.value) {
+    return product.hits.hits[0];
+  }
+  return {};
 }
 
 export async function getRelatedProducts(brand) {
@@ -724,7 +728,7 @@ export async function getFilters(body) {
 }
 export async function getQueryResults(query) {
   const results = {};
-  ['Sneakers', 'Streetwear'].map(async (product) => {
+  await asyncForEach(['Sneakers', 'Streetwear'], async (product) => {
     const body = {
       query: {
         bool: {
@@ -742,13 +746,8 @@ export async function getQueryResults(query) {
         },
       },
     };
-    try {
-      const products = await esclient.search({ index: 'buyer', body });
-      results.product = products.hits.total.value;
-    } catch (e) {
-      logger.error('error in getQueryResults: ', e.message);
-      return { message: e.message };
-    }
+    const products = await esclient.search({ index: 'buyer', body });
+    results[product] = await products.hits.total.value;
   });
   return results;
 }
@@ -803,7 +802,7 @@ export async function getSearch(index, queryString, size) {
   };
   try {
     const products = await esclient.search({ index, body: query });
-    return products;
+    return { results: products, error: false };
   } catch (e) {
     logger.error('error in getSearch: ', e.message);
     return { error: e.message };
