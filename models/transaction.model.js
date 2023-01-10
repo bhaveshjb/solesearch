@@ -167,7 +167,7 @@ const TransactionSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: { createdAt: true, updatedAt: true } }
+  { collection: 'transaction' }
 );
 TransactionSchema.plugin(toJSON);
 TransactionSchema.plugin(mongoosePaginateV2);

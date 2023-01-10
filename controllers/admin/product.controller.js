@@ -14,6 +14,7 @@ import { sendEmail } from '../../services/email.service';
 import ApiError from '../../utils/ApiError';
 import uploadToCloudinary from '../../utils/cloudinary';
 import generateProductId from '../../utils/generateProductId';
+import { asyncForEach } from '../../utils/common';
 
 const csv = require('csvtojson');
 
@@ -453,7 +454,7 @@ export const getTrendingProducts = catchAsync(async (req, res) => {
   const products = await getTrendingBids();
   const sneakers = [];
   const streetwear = [];
-  products.map(async (prod) => {
+  await asyncForEach(products, async (prod) => {
     const result = await Product.aggregate([
       { $match: { slug: prod._id.slug, product_listed_on_dryp: true, inactive: false, customer_ordered: false } },
       {
@@ -465,7 +466,7 @@ export const getTrendingProducts = catchAsync(async (req, res) => {
         },
       },
     ]);
-    if (result) {
+    if (result.length) {
       if (result[0]._id.product_type === 'Sneakers') {
         sneakers.push(prod._id.slug, prod._id.name, prod._id.price, prod.count);
       } else if (result[0]._id.product_type === 'Streetwear') {
@@ -478,7 +479,7 @@ export const getTrendingProducts = catchAsync(async (req, res) => {
 export const getRecentlySoldProducts = catchAsync(async (req, res) => {
   const products = await getRecentlySoldOrders();
   const sneakers = [];
-  products.map(async (prod) => {
+  const promises = products.map(async (prod) => {
     const result = await Product.aggregate([
       {
         $match: {
@@ -498,10 +499,11 @@ export const getRecentlySoldProducts = catchAsync(async (req, res) => {
         },
       },
     ]);
-    if (result) {
-      sneakers.push(prod.slug, prod.name, result[0].price);
+    if (result.length) {
+      sneakers.push([prod.slug, prod.name, result[0].price]);
     }
   });
+  await Promise.all(promises);
   return res.send({ products: sneakers });
 });
 export const getOnSaleProducts = catchAsync(async (req, res) => {
@@ -518,9 +520,10 @@ export const getOnSaleProducts = catchAsync(async (req, res) => {
     },
   ]);
   const result = [];
-  products.map(async (prod) => {
+  const promises = products.map(async (prod) => {
     result.push(prod._id.slug, prod._id.name, prod.price, prod.count);
   });
+  await Promise.all(promises);
   return res.send({ products: result });
 });
 export const productsWithFilters = catchAsync(async (req, res) => {
@@ -545,7 +548,7 @@ export const filters = catchAsync(async (req, res) => {
 export const queryResults = catchAsync(async (req, res) => {
   const { query } = req.params;
   const products = await productService.getQueryResults(query);
-  return res.send({ products });
+  return res.send({ results: products, error: false });
 });
 export const search = catchAsync(async (req, res) => {
   const { index, size } = req.params;

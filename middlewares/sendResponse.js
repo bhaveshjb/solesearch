@@ -9,10 +9,11 @@ function sendResponse(req, res, next) {
         message: originalData.message,
         stack: originalData.stack,
       };
-    } else if (originalData.results) {
-      // eslint-disable-next-line prefer-rest-params
-      arguments[0] = { status: 'Success', data: originalData.results };
     }
+    // else if (originalData.results) {
+    //   // eslint-disable-next-line prefer-rest-params
+    //   arguments[0] = { status: 'Success', data: originalData.results };
+    // }
     // eslint-disable-next-line prefer-rest-params
     response.apply(res, arguments);
   };

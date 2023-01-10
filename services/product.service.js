@@ -715,7 +715,7 @@ export async function getFilters(body) {
 }
 export async function getQueryResults(query) {
   const results = {};
-  ['Sneakers', 'Streetwear'].map(async (product) => {
+  const promises = ['Sneakers', 'Streetwear'].map(async (product) => {
     const body = {
       query: {
         bool: {
@@ -735,12 +735,13 @@ export async function getQueryResults(query) {
     };
     try {
       const products = await esclient.search({ index: 'buyer', body });
-      results.product = products.hits.total.value;
+      results[product] = products.hits.total.value;
     } catch (e) {
       logger.error('error in getQueryResults: ', e.message);
       return { message: e.message };
     }
   });
+  await Promise.all(promises);
   return results;
 }
 
