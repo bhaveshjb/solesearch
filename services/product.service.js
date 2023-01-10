@@ -236,10 +236,10 @@ export async function getProductDetails(slug) {
   const productSizesPrice = await Product.aggregate(aggregateQuery);
   let sizePrice;
   if (productSizesPrice.length) {
-    const sizes = productSizesPrice[0].size;
-    const prices = productSizesPrice[0].price;
+    const { sizes } = productSizesPrice[0];
+    const { prices } = productSizesPrice[0];
     const productIds = productSizesPrice[0].product_ids;
-    sizePrice = leasePrice(sizes, prices, productIds);
+    sizePrice = await leasePrice(sizes, prices, productIds);
   } else {
     sizePrice = [];
   }
@@ -265,11 +265,11 @@ export async function getProductDetails(slug) {
   ]);
   let lowestSoldPrice;
 
-  if (soldPrice) {
-    lowestSoldPrice = soldPrice.reduce((acc, product) => {
-      acc[product._id.size] = product.price;
-      return acc;
-    }, 0);
+  if (soldPrice.length) {
+    lowestSoldPrice = soldPrice.reduce((obj, product) => {
+      obj[product._id.size] = product.price;
+      return obj;
+    }, {});
   } else {
     lowestSoldPrice = 0;
   }
