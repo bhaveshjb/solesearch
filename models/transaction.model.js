@@ -7,17 +7,17 @@ const TransactionSchema = new mongoose.Schema(
     /**
      * created By
      * */
-    // createdBy: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'User',
-    // },
-    // /**
-    //  * updated By
-    //  * */
-    // updatedBy: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'User',
-    // },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    /**
+     * updated By
+     * */
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
     /**
      * buyer
      * */

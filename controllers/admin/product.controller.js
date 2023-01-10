@@ -479,7 +479,7 @@ export const getTrendingProducts = catchAsync(async (req, res) => {
 export const getRecentlySoldProducts = catchAsync(async (req, res) => {
   const products = await getRecentlySoldOrders();
   const sneakers = [];
-  await asyncForEach(products, async (prod) => {
+  const promises = products.map(async (prod) => {
     const result = await Product.aggregate([
       {
         $match: {
@@ -503,6 +503,7 @@ export const getRecentlySoldProducts = catchAsync(async (req, res) => {
       sneakers.push([prod.slug, prod.name, result[0].price]);
     }
   });
+  await Promise.all(promises);
   return res.send({ products: sneakers });
 });
 export const getOnSaleProducts = catchAsync(async (req, res) => {
@@ -519,9 +520,10 @@ export const getOnSaleProducts = catchAsync(async (req, res) => {
     },
   ]);
   const result = [];
-  await asyncForEach(products, async (prod) => {
+  const promises = products.map(async (prod) => {
     result.push(prod._id.slug, prod._id.name, prod.price, prod.count);
   });
+  await Promise.all(promises);
   return res.send({ products: result });
 });
 export const productsWithFilters = catchAsync(async (req, res) => {

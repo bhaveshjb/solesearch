@@ -4,20 +4,20 @@ import { toJSON } from 'models/plugins';
 
 const ProductSchema = new mongoose.Schema(
   {
-    // /**
-    //  * created By
-    //  * */
-    // createdBy: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'User',
-    // },
-    // /**
-    //  * updated By
-    //  * */
-    // updatedBy: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'User',
-    // },
+    /**
+     * created By
+     * */
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    /**
+     * updated By
+     * */
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
     /**
      * brand_name
      * */
