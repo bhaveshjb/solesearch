@@ -7,17 +7,17 @@ const TransactionSchema = new mongoose.Schema(
     /**
      * created By
      * */
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    /**
-     * updated By
-     * */
-    updatedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
+    // createdBy: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'User',
+    // },
+    // /**
+    //  * updated By
+    //  * */
+    // updatedBy: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'User',
+    // },
     /**
      * buyer
      * */
@@ -167,7 +167,7 @@ const TransactionSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: { createdAt: true, updatedAt: true } }
+  { collection: 'transaction' }
 );
 TransactionSchema.plugin(toJSON);
 TransactionSchema.plugin(mongoosePaginateV2);

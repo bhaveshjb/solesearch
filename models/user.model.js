@@ -70,87 +70,90 @@ const AddressSchema = new mongoose.Schema({
     type: String,
   },
 });
-const UserSchema = new mongoose.Schema({
-  /**
-   * Email address of User
-   * */
-  email: {
-    type: String,
-    match: /.+@.+\..+/,
-    unique: true,
+const UserSchema = new mongoose.Schema(
+  {
+    /**
+     * Email address of User
+     * */
+    email: {
+      type: String,
+      match: /.+@.+\..+/,
+      unique: true,
+    },
+    /**
+     * For email verification
+     * */
+    // emailVerified: {
+    //   type: Boolean,
+    //   private: true,
+    // },
+    /**
+     * custom server authentication
+     * */
+    // codes: {
+    //   type: [CodeSchema],
+    // },
+    /**
+     * password for authentication
+     * */
+    password: {
+      type: String,
+      private: true,
+    },
+    /**
+     * first_name of user
+     * */
+    first_name: {
+      type: String,
+    },
+    /**
+     * last_name of user
+     * */
+    last_name: {
+      type: String,
+    },
+    wish_list: {
+      type: [String],
+    },
+    phone: {
+      type: String,
+    },
+    instagram: {
+      type: String,
+    },
+    /**
+     * shoe_size of user
+     * */
+    shoe_size: {
+      type: String,
+    },
+    /**
+     * isRegistered
+     * */
+    isRegistered: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isPassword: {
+      type: Boolean,
+      default: false,
+    },
+    address: {
+      type: [AddressSchema],
+    },
+    /**
+     * default_address for user
+     * */
+    default_address: {
+      type: String,
+    },
   },
-  /**
-   * For email verification
-   * */
-  // emailVerified: {
-  //   type: Boolean,
-  //   private: true,
-  // },
-  /**
-   * custom server authentication
-   * */
-  // codes: {
-  //   type: [CodeSchema],
-  // },
-  /**
-   * password for authentication
-   * */
-  password: {
-    type: String,
-    private: true,
-  },
-  /**
-   * first_name of user
-   * */
-  first_name: {
-    type: String,
-  },
-  /**
-   * last_name of user
-   * */
-  last_name: {
-    type: String,
-  },
-  wish_list: {
-    type: [String],
-  },
-  phone: {
-    type: String,
-  },
-  instagram: {
-    type: String,
-  },
-  /**
-   * shoe_size of user
-   * */
-  shoe_size: {
-    type: String,
-  },
-  /**
-   * isRegistered
-   * */
-  isRegistered: {
-    type: Boolean,
-    default: false,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  isPassword: {
-    type: Boolean,
-    default: false,
-  },
-  address: {
-    type: [AddressSchema],
-  },
-  /**
-   * default_address for user
-   * */
-  default_address: {
-    type: String,
-  },
-});
+  { collection: 'user' }
+);
 UserSchema.plugin(toJSON);
 UserSchema.plugin(mongoosePaginateV2);
 /**
