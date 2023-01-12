@@ -16,10 +16,10 @@ import { errorConverter, errorHandler } from 'middlewares/error';
 import sendResponse from 'middlewares/sendResponse';
 import config from 'config/config';
 import { successHandler, errorHandler as morganErrorHandler } from 'config/morgan';
-
+import schema from './graphql/root.schema';
 // import ejs from 'ejs';
 //  const upload = require('multer')({ dest: '/tmp' });');
-
+const { graphqlHTTP } = require('express-graphql');
 const { adminBro } = require('./utils/adminBro');
 const { adminBroRoute } = require('./utils/adminBro');
 
@@ -72,6 +72,13 @@ app.use(express.static(path.join(__dirname, '../public')));
 // jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
+app.use(
+  '/admin-panel/api/graphql',
+  graphqlHTTP({
+    schema,
+    graphiql: true,
+  })
+);
 
 app.use('/admin-panel', routes);
 // send back a 404 error for any unknown api request

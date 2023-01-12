@@ -807,3 +807,26 @@ export async function getOrders(filter) {
   const order = await Transaction.find(filter);
   return order;
 }
+
+export async function getSellerProducts(seller) {
+  try {
+    const aggregate = [
+      {
+        $match: {
+          seller_email: seller,
+          inactive: false,
+          product_listed_on_dryp: true,
+          customer_ordered: false,
+        },
+      },
+      { $group: { _id: { slug: '$slug', size: '$size' } } },
+    ];
+
+    const products = [];
+    const result = await Product.aggregate(aggregate);
+    result.forEach((res) => products.push([res._id.slug, res._id.size]));
+    return products;
+  } catch (err) {
+    console.log(err);
+  }
+}

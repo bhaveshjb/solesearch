@@ -2,13 +2,13 @@ version: '3.1'
 
 services:
   db:
-   image: mongo:latest
-   restart: always
-   container_name: solesearchpython-local-db
-   ports:
-    - '27017:27017'
-   volumes:
-    - mongodata:/data/db
+    image: mongo:latest
+    restart: always
+    container_name: solesearchpython-local-db
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodata:/data/db
   elasticsearch:
     container_name: tqd-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
@@ -16,7 +16,7 @@ services:
       - esdata:/usr/share/elasticsearch/data
     environment:
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
       - discovery.type=single-node
     logging:
       driver: none
