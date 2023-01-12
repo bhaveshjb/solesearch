@@ -1,5 +1,6 @@
-import { getBidsList } from '../../../services/bids.service';
+import { getBidsList, getSellerAcceptedBids} from '../../../services/bids.service';
 import { Bids } from 'models';
+import { getSellerProducts } from "../../../services/product.service";
 
 const { transactionService } = require('../../../services');
 const { Transaction } = require('../../../models');
@@ -99,7 +100,7 @@ const BidsQueries = {
   async ordersByBuyer(_, args, context) {
     const user = await getIdentityCheck(context);
     const filter = {
-      buyer: 'harshdeep0907@gmail.com',
+      buyer: user.email,
       is_bid: false,
     };
     const options = {};
@@ -119,13 +120,13 @@ const BidsQueries = {
   async bidsForSeller(_, { id }, context) {
     const seller = await getIdentityCheck(context);
     try {
-      const products = await getSellerProducts(seller);
-      const acceptedProducts = await getSellerAcceptedBids(seller);
+      const products = await getSellerProducts(seller.email);
+      const acceptedProducts = await getSellerAcceptedBids(seller.email);
       const productsNotAccepted = products.filter((product) => !acceptedProducts.includes(product));
       const bids = [];
       for (let i = 0; i < productsNotAccepted.length; i += 1) {
         const { slug, size } = productsNotAccepted[i];
-        const filter = { slug, size, accepted: false, active: true, buyer: { $ne: seller } };
+        const filter = { slug, size, accepted: false, active: true, buyer: { $ne: seller.email } };
         const options = {};
         const newBids = await getBidsList(filter, options);
         bids.push(...newBids);
