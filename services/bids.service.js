@@ -86,3 +86,24 @@ export async function getTrendingBids() {
 
   return bids;
 }
+
+export async function getSellerAcceptedBids(seller) {
+  try {
+    const aggregate = [
+      {
+        $match: {
+          seller,
+          accepted: true,
+        },
+      },
+      { $group: { _id: { slug: '$slug', size: '$size' } } },
+    ];
+
+    const result = await Bids.aggregate(aggregate);
+    const acceptedBids = new Set();
+    result.forEach((res) => acceptedBids.add([res._id.slug, res._id.size]));
+    return acceptedBids;
+  } catch (err) {
+    console.log(err);
+  }
+}

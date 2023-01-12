@@ -12,15 +12,8 @@
           "name": "User Register API",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "register"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "register"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -45,15 +38,8 @@
               "name": "User Register Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "register"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "register"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -184,15 +170,8 @@
               "name": "User Register Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "register"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "register"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -323,15 +302,8 @@
           "name": "User Login API",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "login"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "login"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -356,15 +328,8 @@
               "name": "User Login Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "login"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "login"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -495,15 +460,8 @@
               "name": "User Login Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "login"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "login"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -634,15 +592,8 @@
               "name": "User Login API fail",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "login"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "login"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -772,9 +723,7 @@
               "script": {
                 "id": "ddb9451b-e12b-43d6-b05e-a1113ba5af66",
                 "type": "text/javascript",
-                "exec": [
-                  "pm.collectionVariables.set(\"authToken\", pm.response.json().data?.tokens.access.token);"
-                ]
+                "exec": ["pm.collectionVariables.set(\"authToken\", pm.response.json().data?.tokens.access.token);"]
               }
             }
           ]
@@ -784,15 +733,8 @@
           "name": "ForgetPassword API",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "forgot-password"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "forgot-password"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -817,15 +759,8 @@
               "name": "Forget Password Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "forgot-password"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "forgot-password"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -956,15 +891,8 @@
               "name": "Forget Password Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "forgot-password"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "forgot-password"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -1095,15 +1023,8 @@
           "name": "Forget password otp verify",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "verify-reset-otp"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "verify-reset-otp"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -1127,15 +1048,8 @@
               "name": "Forget password otp verify Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "verify-reset-otp"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "verify-reset-otp"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -1265,15 +1179,8 @@
               "name": "Forget password otp verify Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "verify-reset-otp"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "verify-reset-otp"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -1403,15 +1310,8 @@
           "name": "Send VerifyEmail OTP",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "send-verify-otp"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "send-verify-otp"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -1436,15 +1336,8 @@
               "name": "Send VerifyEmail OTP Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "send-verify-otp"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "send-verify-otp"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -1575,15 +1468,8 @@
               "name": "Send VerifyEmail OTP Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "send-verify-otp"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "send-verify-otp"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -1714,15 +1600,8 @@
           "name": "VerifyEmail OTP",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "verify-otp"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "verify-otp"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -1747,15 +1626,8 @@
               "name": "VerifyEmail OTP Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "verify-otp"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "verify-otp"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -1886,15 +1758,8 @@
               "name": "VerifyEmail OTP Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "verify-otp"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "verify-otp"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2025,15 +1890,8 @@
           "name": "Get Current LoggedIn User",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "me"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "me"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -2058,15 +1916,8 @@
               "name": "Get Current LoggedIn User Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "me"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "me"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2197,15 +2048,8 @@
               "name": "Get Current LoggedIn User Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "me"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "me"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2336,15 +2180,8 @@
           "name": "Update Profile",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "me"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "me"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -2378,15 +2215,8 @@
               "name": "Update Profile Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "me"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "me"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2526,15 +2356,8 @@
               "name": "Update Profile Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "me"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "me"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2674,15 +2497,8 @@
           "name": "change password with otp",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "reset-password"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "reset-password"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -2706,15 +2522,8 @@
               "name": "change password with Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "reset-password"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "reset-password"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2844,15 +2653,8 @@
               "name": "change password with Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "reset-password"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "reset-password"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -2982,15 +2784,8 @@
           "name": "logout",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "logout"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "logout"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -3024,15 +2819,8 @@
               "name": "logout Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "logout"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "logout"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -3172,15 +2960,8 @@
               "name": "logout Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "logout"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "logout"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -3320,15 +3101,8 @@
           "name": "refresh token api",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "refresh-tokens"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "refresh-tokens"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -3352,15 +3126,8 @@
               "name": "refresh token api Failed",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "refresh-tokens"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "refresh-tokens"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -3490,15 +3257,8 @@
               "name": "refresh token api Success",
               "originalRequest": {
                 "url": {
-                  "path": [
-                    "v1",
-                    "client",
-                    "auth",
-                    "refresh-tokens"
-                  ],
-                  "host": [
-                    "{{base-url}}"
-                  ],
+                  "path": ["v1", "client", "auth", "refresh-tokens"],
+                  "host": ["{{base-url}}"],
                   "query": [],
                   "variable": []
                 },
@@ -3628,15 +3388,8 @@
           "name": "FaceBook Login API",
           "request": {
             "url": {
-              "path": [
-                "v1",
-                "client",
-                "auth",
-                "facebook"
-              ],
-              "host": [
-                "{{base-url}}"
-              ],
+              "path": ["v1", "client", "auth", "facebook"],
+              "host": ["{{base-url}}"],
               "query": [],
               "variable": []
             },
@@ -3659,9 +3412,7 @@
               "script": {
                 "id": "4efdccc6-a16c-41d7-9a94-5e605bb38d3b",
                 "type": "text/javascript",
-                "exec": [
-                  "pm.collectionVariables.set(\"authToken\", pm.response.json().data?.tokens.access.token);"
-                ]
+                "exec": ["pm.collectionVariables.set(\"authToken\", pm.response.json().data?.tokens.access.token);"]
               }
             }
           ]
@@ -3679,15 +3430,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/user/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "user",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "user", ""]
             },
             "header": [
               {
@@ -3807,15 +3551,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/user/:userId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "user",
-                ":userId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "user", ":userId"],
               "variable": [
                 {
                   "key": "userId"
@@ -3940,15 +3677,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/user/:userId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "user",
-                ":userId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "user", ":userId"],
               "variable": [
                 {
                   "key": "userId"
@@ -4047,15 +3777,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/user/:userId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "user",
-                ":userId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "user", ":userId"],
               "variable": [
                 {
                   "key": "userId"
@@ -4180,15 +3903,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/user/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "user",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "user", ""]
             },
             "header": [
               {
@@ -4308,15 +4024,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/user/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "user",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "user", "paginated"]
             },
             "header": [
               {
@@ -4443,15 +4152,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/address/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "address",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "address", ""]
             },
             "header": [
               {
@@ -4571,15 +4273,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/address/:addressId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "address",
-                ":addressId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "address", ":addressId"],
               "variable": [
                 {
                   "key": "addressId"
@@ -4704,15 +4399,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/address/:addressId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "address",
-                ":addressId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "address", ":addressId"],
               "variable": [
                 {
                   "key": "addressId"
@@ -4811,15 +4499,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/address/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "address",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "address", ""]
             },
             "header": [
               {
@@ -4946,15 +4627,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/adminUsers/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "adminUsers",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "adminUsers", ""]
             },
             "header": [
               {
@@ -5074,15 +4748,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/adminUsers/:adminUsersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "adminUsers",
-                ":adminUsersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "adminUsers", ":adminUsersId"],
               "variable": [
                 {
                   "key": "adminUsersId"
@@ -5207,15 +4874,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/adminUsers/:adminUsersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "adminUsers",
-                ":adminUsersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "adminUsers", ":adminUsersId"],
               "variable": [
                 {
                   "key": "adminUsersId"
@@ -5314,15 +4974,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/adminUsers/:adminUsersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "adminUsers",
-                ":adminUsersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "adminUsers", ":adminUsersId"],
               "variable": [
                 {
                   "key": "adminUsersId"
@@ -5447,15 +5100,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/adminUsers/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "adminUsers",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "adminUsers", ""]
             },
             "header": [
               {
@@ -5575,15 +5221,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/adminUsers/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "adminUsers",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "adminUsers", "paginated"]
             },
             "header": [
               {
@@ -5710,15 +5349,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/product/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "product",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "product", ""]
             },
             "header": [
               {
@@ -5838,15 +5470,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/product/:productId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "product",
-                ":productId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "product", ":productId"],
               "variable": [
                 {
                   "key": "productId"
@@ -5971,15 +5596,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/product/:productId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "product",
-                ":productId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "product", ":productId"],
               "variable": [
                 {
                   "key": "productId"
@@ -6078,15 +5696,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/product/:productId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "product",
-                ":productId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "product", ":productId"],
               "variable": [
                 {
                   "key": "productId"
@@ -6211,15 +5822,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/product/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "product",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "product", ""]
             },
             "header": [
               {
@@ -6339,15 +5943,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/product/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "product",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "product", "paginated"]
             },
             "header": [
               {
@@ -6474,15 +6071,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/subscription/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "subscription",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "subscription", ""]
             },
             "header": [
               {
@@ -6602,15 +6192,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/subscription/:subscriptionId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "subscription",
-                ":subscriptionId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "subscription", ":subscriptionId"],
               "variable": [
                 {
                   "key": "subscriptionId"
@@ -6735,15 +6318,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/subscription/:subscriptionId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "subscription",
-                ":subscriptionId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "subscription", ":subscriptionId"],
               "variable": [
                 {
                   "key": "subscriptionId"
@@ -6842,15 +6418,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/subscription/:subscriptionId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "subscription",
-                ":subscriptionId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "subscription", ":subscriptionId"],
               "variable": [
                 {
                   "key": "subscriptionId"
@@ -6975,15 +6544,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/subscription/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "subscription",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "subscription", ""]
             },
             "header": [
               {
@@ -7103,15 +6665,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/subscription/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "subscription",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "subscription", "paginated"]
             },
             "header": [
               {
@@ -7238,15 +6793,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/verifiedSellers/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "verifiedSellers",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "verifiedSellers", ""]
             },
             "header": [
               {
@@ -7366,15 +6914,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/verifiedSellers/:verifiedSellersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "verifiedSellers",
-                ":verifiedSellersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "verifiedSellers", ":verifiedSellersId"],
               "variable": [
                 {
                   "key": "verifiedSellersId"
@@ -7499,15 +7040,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/verifiedSellers/:verifiedSellersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "verifiedSellers",
-                ":verifiedSellersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "verifiedSellers", ":verifiedSellersId"],
               "variable": [
                 {
                   "key": "verifiedSellersId"
@@ -7606,15 +7140,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/verifiedSellers/:verifiedSellersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "verifiedSellers",
-                ":verifiedSellersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "verifiedSellers", ":verifiedSellersId"],
               "variable": [
                 {
                   "key": "verifiedSellersId"
@@ -7739,15 +7266,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/verifiedSellers/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "verifiedSellers",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "verifiedSellers", ""]
             },
             "header": [
               {
@@ -7867,15 +7387,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/verifiedSellers/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "verifiedSellers",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "verifiedSellers", "paginated"]
             },
             "header": [
               {
@@ -8002,15 +7515,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/flakers/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "flakers",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "flakers", ""]
             },
             "header": [
               {
@@ -8130,15 +7636,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/flakers/:flakersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "flakers",
-                ":flakersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "flakers", ":flakersId"],
               "variable": [
                 {
                   "key": "flakersId"
@@ -8263,15 +7762,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/flakers/:flakersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "flakers",
-                ":flakersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "flakers", ":flakersId"],
               "variable": [
                 {
                   "key": "flakersId"
@@ -8370,15 +7862,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/flakers/:flakersId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "flakers",
-                ":flakersId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "flakers", ":flakersId"],
               "variable": [
                 {
                   "key": "flakersId"
@@ -8503,15 +7988,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/flakers/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "flakers",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "flakers", ""]
             },
             "header": [
               {
@@ -8631,15 +8109,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/flakers/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "flakers",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "flakers", "paginated"]
             },
             "header": [
               {
@@ -8766,15 +8237,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/discountCoupons/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "discountCoupons",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "discountCoupons", ""]
             },
             "header": [
               {
@@ -8894,15 +8358,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/discountCoupons/:discountCouponsId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "discountCoupons",
-                ":discountCouponsId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "discountCoupons", ":discountCouponsId"],
               "variable": [
                 {
                   "key": "discountCouponsId"
@@ -9027,15 +8484,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/discountCoupons/:discountCouponsId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "discountCoupons",
-                ":discountCouponsId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "discountCoupons", ":discountCouponsId"],
               "variable": [
                 {
                   "key": "discountCouponsId"
@@ -9134,15 +8584,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/discountCoupons/:discountCouponsId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "discountCoupons",
-                ":discountCouponsId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "discountCoupons", ":discountCouponsId"],
               "variable": [
                 {
                   "key": "discountCouponsId"
@@ -9267,15 +8710,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/discountCoupons/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "discountCoupons",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "discountCoupons", ""]
             },
             "header": [
               {
@@ -9395,15 +8831,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/discountCoupons/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "discountCoupons",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "discountCoupons", "paginated"]
             },
             "header": [
               {
@@ -9530,15 +8959,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/bids/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "bids",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "bids", ""]
             },
             "header": [
               {
@@ -9658,15 +9080,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/bids/:bidsId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "bids",
-                ":bidsId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "bids", ":bidsId"],
               "variable": [
                 {
                   "key": "bidsId"
@@ -9791,15 +9206,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/bids/:bidsId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "bids",
-                ":bidsId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "bids", ":bidsId"],
               "variable": [
                 {
                   "key": "bidsId"
@@ -9898,15 +9306,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/bids/:bidsId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "bids",
-                ":bidsId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "bids", ":bidsId"],
               "variable": [
                 {
                   "key": "bidsId"
@@ -10031,15 +9432,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/bids/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "bids",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "bids", ""]
             },
             "header": [
               {
@@ -10159,15 +9553,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/bids/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "bids",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "bids", "paginated"]
             },
             "header": [
               {
@@ -10294,15 +9681,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/transaction/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "transaction",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "transaction", ""]
             },
             "header": [
               {
@@ -10422,15 +9802,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/transaction/:transactionId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "transaction",
-                ":transactionId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "transaction", ":transactionId"],
               "variable": [
                 {
                   "key": "transactionId"
@@ -10555,15 +9928,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/transaction/:transactionId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "transaction",
-                ":transactionId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "transaction", ":transactionId"],
               "variable": [
                 {
                   "key": "transactionId"
@@ -10662,15 +10028,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/transaction/:transactionId",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "transaction",
-                ":transactionId"
-              ],
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "transaction", ":transactionId"],
               "variable": [
                 {
                   "key": "transactionId"
@@ -10795,15 +10154,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/transaction/",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "transaction",
-                ""
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "transaction", ""]
             },
             "header": [
               {
@@ -10923,15 +10275,8 @@
           "request": {
             "url": {
               "raw": "{{base-url}}/v1/client/transaction/paginated",
-              "host": [
-                "{{base-url}}"
-              ],
-              "path": [
-                "v1",
-                "client",
-                "transaction",
-                "paginated"
-              ]
+              "host": ["{{base-url}}"],
+              "path": ["v1", "client", "transaction", "paginated"]
             },
             "header": [
               {
