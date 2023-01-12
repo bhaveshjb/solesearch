@@ -1,6 +1,6 @@
-import { getBidsList, getSellerAcceptedBids} from '../../../services/bids.service';
 import { Bids } from 'models';
-import { getSellerProducts } from "../../../services/product.service";
+import { getBidsList, getSellerAcceptedBids, updateManyBids } from '../../../services/bids.service';
+import { getSellerProducts } from '../../../services/product.service';
 
 const { transactionService } = require('../../../services');
 const { Transaction } = require('../../../models');
